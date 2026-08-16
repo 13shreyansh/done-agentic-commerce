@@ -540,6 +540,115 @@ async function showKeystoreAddress(nameInput) {
   console.log(wallet.address);
 }
 
+async function sendMainnetAvax(nameInput, expectedAddressInput, recipientInput, amountInput) {
+  const expectedAddress = getAddress(expectedAddressInput || process.env.AGENTIX_ADDRESS || DEFAULT_ADDRESS);
+  const recipient = getAddress(recipientInput);
+  const zeroAddress = "0x0000000000000000000000000000000000000000";
+  const amountText = amountInput.trim();
+
+  if (!/^(?:0|[1-9][0-9]*)(?:\.[0-9]+)?$/.test(amountText)) {
+    throw new Error("Amount must be a plain positive decimal, for example 0.00002.");
+  }
+  const value = parseEther(amountText);
+  const safetyCap = parseEther("0.001");
+  if (value <= 0n) throw new Error("Amount must be greater than zero.");
+  if (value > safetyCap) {
+    throw new Error("This guarded gas-funding command refuses to transfer more than 0.001 AVAX.");
+  }
+  if (recipient === zeroAddress || recipient === expectedAddress) {
+    throw new Error("Refusing transfer: recipient must be a different normal wallet address.");
+  }
+
+  const provider = new JsonRpcProvider(MAINNET_RPC, 43114, { staticNetwork: true });
+  const network = await provider.getNetwork();
+  if (network.chainId !== 43114n) {
+    throw new Error(`Refusing to send: expected Avalanche mainnet chain ID 43114, received ${network.chainId}.`);
+  }
+
+  const [senderCode, recipientCode, senderAvax, recipientBefore, feeData] = await Promise.all([
+    provider.getCode(expectedAddress),
+    provider.getCode(recipient),
+    provider.getBalance(expectedAddress),
+    provider.getBalance(recipient),
+    provider.getFeeData(),
+  ]);
+  if (senderCode !== "0x" || recipientCode !== "0x") {
+    throw new Error("Refusing transfer: both sender and recipient must be normal wallets, not smart contracts.");
+  }
+
+  const callRequest = { from: expectedAddress, to: recipient, value };
+  const estimatedGas = await provider.estimateGas(callRequest);
+  const gasLimit = estimatedGas + (estimatedGas / 5n);
+  const maxGasPrice = feeData.maxFeePerGas || feeData.gasPrice;
+  if (!maxGasPrice) throw new Error("Could not determine the Avalanche mainnet gas price.");
+  const estimatedMaxFee = gasLimit * maxGasPrice;
+  const requiredBalance = value + estimatedMaxFee;
+  if (senderAvax <= requiredBalance) {
+    throw new Error(`Insufficient AVAX. Balance is ${formatEther(senderAvax)} AVAX; transfer plus estimated maximum fee requires more than ${formatEther(requiredBalance)} AVAX.`);
+  }
+
+  console.log("");
+  console.log(yellow("REAL MAINNET AVAX TRANSFER — irreversible"));
+  console.log("Purpose:        minimal gas funding for a controlled wallet");
+  console.log("Network:        Avalanche C-Chain mainnet (chain ID 43114)");
+  console.log(`Sender:         ${expectedAddress}`);
+  console.log(`Recipient:      ${recipient}`);
+  console.log(`Amount:         ${formatEther(value)} AVAX`);
+  console.log(`Sender balance: ${formatEther(senderAvax)} AVAX`);
+  console.log(`Max gas estimate: ${formatEther(estimatedMaxFee)} AVAX`);
+  console.log("");
+
+  const approved = await confirm({
+    message: `Broadcast exactly ${formatEther(value)} AVAX to ${recipient} on Avalanche MAINNET?`,
+    default: false,
+  });
+  if (!approved) {
+    console.log("Cancelled. No transaction was signed or broadcast.");
+    return;
+  }
+
+  const encryptedJson = await readFile(keystorePath(nameInput), "utf8");
+  const unlockedWallet = await unlockKeystore(
+    encryptedJson,
+    `Unlock ${nameInput} to sign this exact mainnet transfer:`,
+  );
+  if (getAddress(unlockedWallet.address) !== expectedAddress) {
+    throw new Error(`Keystore address ${unlockedWallet.address} does not match the approved sender ${expectedAddress}. Nothing was signed.`);
+  }
+
+  const signer = unlockedWallet.connect(provider);
+  const freshBalance = await provider.getBalance(expectedAddress);
+  if (freshBalance <= requiredBalance) {
+    throw new Error("AVAX balance changed before signing and is now insufficient. No transaction was submitted.");
+  }
+
+  console.log("Signing the one approved AVAX transfer...");
+  const transaction = await signer.sendTransaction({ to: recipient, value, gasLimit });
+  console.log(`Submitted: ${transaction.hash}`);
+  console.log(`Snowtrace: https://snowtrace.io/tx/${transaction.hash}`);
+  const receipt = await transaction.wait(1);
+  if (!receipt || receipt.status !== 1) {
+    throw new Error(`Transaction failed: ${transaction.hash}`);
+  }
+
+  const confirmedTransaction = await provider.getTransaction(transaction.hash);
+  if (
+    !confirmedTransaction
+    || getAddress(confirmedTransaction.from) !== expectedAddress
+    || !confirmedTransaction.to
+    || getAddress(confirmedTransaction.to) !== recipient
+    || confirmedTransaction.value !== value
+  ) {
+    throw new Error(`Transaction confirmed, but its sender, recipient, or value did not match the approved transfer. Inspect ${transaction.hash}.`);
+  }
+
+  const recipientAfter = await provider.getBalance(recipient);
+  const paidFee = receipt.fee ?? (receipt.gasUsed * (receipt.gasPrice ?? 0n));
+  console.log(green(`Confirmed in block ${receipt.blockNumber}.`));
+  console.log(`Recipient balance: ${formatEther(recipientBefore)} → ${formatEther(recipientAfter)} AVAX`);
+  console.log(`Network fee: ${formatEther(paidFee)} AVAX`);
+}
+
 async function sendMainnetXsgd(nameInput, expectedAddressInput, recipientInput, amountInput) {
   const expectedAddress = getAddress(expectedAddressInput || process.env.AGENTIX_ADDRESS || DEFAULT_ADDRESS);
   const recipient = getAddress(recipientInput);
@@ -852,6 +961,14 @@ wallet
   .description("Decrypt a keystore and print its address")
   .option("-n, --name <name>", "Local wallet name", "wallet")
   .action(async ({ name }) => showKeystoreAddress(name));
+wallet
+  .command("send-mainnet-avax")
+  .description("Send an explicitly confirmed, tightly capped AVAX gas amount on Avalanche mainnet")
+  .requiredOption("-t, --to <address>", "Recipient normal-wallet EVM address")
+  .requiredOption("-m, --amount <avax>", "Exact AVAX amount (maximum 0.001)")
+  .option("-n, --name <name>", "Local encrypted wallet name", "wallet")
+  .option("-a, --address <address>", "Address the encrypted wallet must match", DEFAULT_ADDRESS)
+  .action(async ({ name, address, to, amount }) => sendMainnetAvax(name, address, to, amount));
 wallet
   .command("send-mainnet-xsgd")
   .description("Send an explicitly confirmed, capped amount of real XSGD on Avalanche mainnet")
