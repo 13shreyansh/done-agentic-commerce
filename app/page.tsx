@@ -493,15 +493,8 @@ export default function Home() {
   useEffect(() => {
     if (!autoplay || stage !== "ordered" || !orderResult) return;
     const revealProof = window.setTimeout(() => setProofOpen(true), 1800);
-    const replayLoop = window.setTimeout(() => {
-      setProofOpen(false);
-      play();
-    }, 8500);
-    return () => {
-      window.clearTimeout(revealProof);
-      window.clearTimeout(replayLoop);
-    };
-  }, [autoplay, orderResult, play, stage]);
+    return () => window.clearTimeout(revealProof);
+  }, [autoplay, orderResult, stage]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
