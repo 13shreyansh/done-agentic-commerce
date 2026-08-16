@@ -2,6 +2,8 @@
 
 > Don’t buy products. Buy outcomes.
 
+**Live demo:** [done-agentic-commerce.vercel.app](https://done-agentic-commerce.vercel.app)
+
 DONE is a bounded autonomous commerce agent for Singapore. A customer states an outcome in ordinary language, approves one maximum spend, and receives a completed order with an inspectable decision trail and payment proof.
 
 ## One-minute demo
