@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+/* eslint-disable @next/next/no-html-link-for-pages -- plain anchors avoid a vinext production prefetch crash */
 import "./architecture.css";
 
 export const metadata: Metadata = {
@@ -32,7 +32,7 @@ export default function Architecture() {
   return (
     <main className="architecture-page">
       <header className="architecture-hero">
-        <nav><Link href="/">← Interactive demo</Link><a href={SNOWTRACE} target="_blank" rel="noreferrer">Snowtrace proof ↗</a></nav>
+        <nav><a href="/">← Interactive demo</a><a href={SNOWTRACE} target="_blank" rel="noreferrer">Snowtrace proof ↗</a></nav>
         <div className="architecture-kicker"><span /> IMPLEMENTED ARCHITECTURE</div>
         <h1>One simple message.<br /><em>Four inspectable boundaries.</em></h1>
         <p>DONE turns an outcome into a ranked product, a single-use authority, a machine payment, and a replay-safe execution record. The labels below state exactly what ran and what remains a sandbox.</p>
@@ -85,7 +85,7 @@ export default function Architecture() {
         <ul><li>Wallet private key</li><li>Card PAN or CVV</li><li>OTP or Apple credentials</li><li>Full delivery address</li></ul>
       </section>
 
-      <footer><Link href="/">Run the demo <span>→</span></Link><p>DONE · Don’t buy products. Buy outcomes.</p></footer>
+      <footer><a href="/">Run the demo <span>→</span></a><p>DONE · Don’t buy products. Buy outcomes.</p></footer>
     </main>
   );
 }
