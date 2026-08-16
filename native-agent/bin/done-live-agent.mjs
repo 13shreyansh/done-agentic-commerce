@@ -253,7 +253,7 @@ const timer = setInterval(async () => {
       console.log(`Explicit approval received at message ${row.rowId}. Executing.`);
       sendMessage(chat.target, "Approved. I’m searching the live merchant catalogue, applying your constraints, then paying the best eligible result…");
       await transition("discovering", "Explicit iMessage approval received", `Searching within the S$${request.requestedBudgetSgd.toFixed(2)} mandate`, {
-        approval: { status: "approved", maxSpendSgd: request.requestedBudgetSgd, source: "iMessage", messageRowId: Number(row.rowId) },
+        approval: { status: "approved", maxSpendSgd: request.requestedBudgetSgd, source: "iMessage" },
       }, "complete");
       if (values["open-dashboard"]) openLiveDashboard(values["dashboard-url"]);
       const discoveryProof = await discoverShopifyProducts({

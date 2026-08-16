@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   twitter: { images: [] },
 };
 
-const SNOWTRACE = "https://testnet.snowtrace.io/tx/0xe27f11579a800f96d02438cdc2cd823c4dd780d6b6d16b6c56a8cbe82f586914";
+const SNOWTRACE = "https://testnet.snowtrace.io/tx/0x195d69332d96bc8109ddd6f16bf55aaa95e968301d75951e69f7d5fd3733cb5d";
 
 type Status = "live" | "executed" | "sandbox";
 

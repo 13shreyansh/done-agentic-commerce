@@ -1,22 +1,449 @@
 {
   "version": "done-live-run-v1",
-  "runId": "waiting-1786858181365",
-  "stage": "listening",
+  "runId": "message-4965-1786859838453",
+  "stage": "complete",
   "truthfulMode": "LIVE DISCOVERY · FUJI TESTNET · REAL AWS · MERCHANT CART HANDOFF",
-  "request": null,
-  "approval": null,
-  "discovery": null,
-  "payment": null,
-  "aws": null,
-  "receipt": null,
+  "request": {
+    "isPurchaseRequest": true,
+    "summary": "Source 20 sachets of no-added-sugar coffee for delivery to the saved SMU address, keeping the total under S$12.",
+    "acknowledgment": "I’ve noted 20 sachets of no-added-sugar coffee for your saved SMU address, with a total budget under S$12.",
+    "item": "No-added-sugar coffee sachets",
+    "quantity": 20,
+    "deliveryLocation": "Saved SMU address",
+    "budgetSgd": 12,
+    "constraints": [
+      "No added sugar",
+      "Total must stay under S$12",
+      "Hard safety ceiling: S$30.00"
+    ],
+    "modelId": "gpt-5.6-luna"
+  },
+  "approval": {
+    "status": "approved",
+    "maxSpendSgd": 12,
+    "source": "iMessage"
+  },
+  "discovery": {
+    "version": "done-live-discovery-v1",
+    "source": "Shun Dat Shopify catalogue",
+    "endpoint": "https://www.shundat.com/products.json?limit=250",
+    "shippingEvidenceUrl": "https://www.shundat.com/",
+    "fetchedAt": "2026-08-16T05:57:25.975Z",
+    "httpStatus": 200,
+    "totalProducts": 250,
+    "evaluatedVariants": 141,
+    "sourceSha256": "f05eb39df1e266ddbff8ef8ac8d7bdc4080837a8fc5f3af587f4532717e0ef68",
+    "query": {
+      "item": "No-added-sugar coffee sachets",
+      "quantity": 20,
+      "constraints": [
+        "No added sugar",
+        "Total must stay under S$12",
+        "Hard safety ceiling: S$30.00"
+      ],
+      "budgetSgd": 12,
+      "requireNoSugar": true
+    },
+    "policy": {
+      "name": "BEST v1",
+      "hardGates": [
+        "In stock",
+        "No added sugar",
+        "Exactly 20 units",
+        "Verified Singapore delivery",
+        "Delivered total ≤ S$12.00"
+      ],
+      "ranking": "Hard-constraint compliance → delivered value → deterministic product ID tie-break"
+    },
+    "shipping": {
+      "freeShipping": true,
+      "evidence": "Free shipping Singapore islandwide; no minimum spend"
+    },
+    "candidates": [
+      {
+        "id": "8373282472115:45127352844467",
+        "productId": "8373282472115",
+        "variantId": "45127352844467",
+        "merchant": "Shun Dat",
+        "title": "Train Brand Penang Coffee O No Sugar Added",
+        "variantTitle": "Train Coffee O",
+        "available": true,
+        "itemPriceSgd": 6.5,
+        "deliveryPriceSgd": 0,
+        "deliveredTotalSgd": 6.5,
+        "deliveryVerified": true,
+        "noAddedSugar": true,
+        "quantityMatched": true,
+        "evidence": "1.TRAIN BRAND PENANG CAP KERETA API KOPI-O KOSONG (12g x 20 Sachets) Product of Penang, Malaysia Train Brand (Cap Kereta Api) is a heritage coffee brand from Penang, established since 1950. Known for its traditional roasting methods, the brand selects premium coffee beans, roasted to perfection to create a bold and aromatic Nanyang-style black coffee. This K",
+        "productUrl": "https://www.shundat.com/products/train-brand-penang-coffee-o-no-sugar-added?variant=45127352844467",
+        "cartUrl": "https://www.shundat.com/cart/45127352844467:1",
+        "imageUrl": "https://cdn.shopify.com/s/files/1/0676/9108/6003/files/sg-11134207-821g7-mgxqmr4espvue1.jpg?v=1762870349",
+        "eligible": true,
+        "score": 97.3,
+        "reasons": [
+          "Selected: highest compliance score, then lowest delivered total",
+          "In stock",
+          "No-added-sugar evidence",
+          "20-unit evidence",
+          "Singapore delivery cost verified",
+          "S$6.50 within mandate"
+        ]
+      },
+      {
+        "id": "8373282472115:45127352877235",
+        "productId": "8373282472115",
+        "variantId": "45127352877235",
+        "merchant": "Shun Dat",
+        "title": "Train Brand Penang Coffee O No Sugar Added",
+        "variantTitle": "Sin Boon Kee",
+        "available": true,
+        "itemPriceSgd": 6.7,
+        "deliveryPriceSgd": 0,
+        "deliveredTotalSgd": 6.7,
+        "deliveryVerified": true,
+        "noAddedSugar": true,
+        "quantityMatched": true,
+        "evidence": "2.Sin Boon Kee Penang Kopi-O Coffee (15g x 20s )新文记槟榔屿传统咖啡乌 (无糖) Product of Penang, Malaysia Penang Kopi-O (No Sugar Added) Our famous traditional black coffee made of premium selected Robusta beans, roasted and blended with our special recipe by mixing butter through the process. For those who prefer the original and authentic taste of coffee, it is best se",
+        "productUrl": "https://www.shundat.com/products/train-brand-penang-coffee-o-no-sugar-added?variant=45127352877235",
+        "cartUrl": "https://www.shundat.com/cart/45127352877235:1",
+        "imageUrl": "https://cdn.shopify.com/s/files/1/0676/9108/6003/files/sg-11134207-821g7-mgxqmr4espvue1.jpg?v=1762870349",
+        "eligible": true,
+        "score": 97.2,
+        "reasons": [
+          "In stock",
+          "No-added-sugar evidence",
+          "20-unit evidence",
+          "Singapore delivery cost verified",
+          "S$6.70 within mandate"
+        ]
+      },
+      {
+        "id": "8373282472115:45127352910003",
+        "productId": "8373282472115",
+        "variantId": "45127352910003",
+        "merchant": "Shun Dat",
+        "title": "Train Brand Penang Coffee O No Sugar Added",
+        "variantTitle": "Cap Televisyen",
+        "available": true,
+        "itemPriceSgd": 6.9,
+        "deliveryPriceSgd": 0,
+        "deliveredTotalSgd": 6.9,
+        "deliveryVerified": true,
+        "noAddedSugar": true,
+        "quantityMatched": true,
+        "evidence": "1.TRAIN BRAND PENANG CAP KERETA API KOPI-O KOSONG (12g x 20 Sachets) Product of Penang, Malaysia Train Brand (Cap Kereta Api) is a heritage coffee brand from Penang, established since 1950. Known for its traditional roasting methods, the brand selects premium coffee beans, roasted to perfection to create a bold and aromatic Nanyang-style black coffee. This K",
+        "productUrl": "https://www.shundat.com/products/train-brand-penang-coffee-o-no-sugar-added?variant=45127352910003",
+        "cartUrl": "https://www.shundat.com/cart/45127352910003:1",
+        "imageUrl": "https://cdn.shopify.com/s/files/1/0676/9108/6003/files/sg-11134207-821g7-mgxqmr4espvue1.jpg?v=1762870349",
+        "eligible": true,
+        "score": 97.1,
+        "reasons": [
+          "In stock",
+          "No-added-sugar evidence",
+          "20-unit evidence",
+          "Singapore delivery cost verified",
+          "S$6.90 within mandate"
+        ]
+      },
+      {
+        "id": "8397162152115:45197447823539",
+        "productId": "8397162152115",
+        "variantId": "45197447823539",
+        "merchant": "Shun Dat",
+        "title": "Yit Foh Tenom Kopi O Kosong (Sabah Traditional Coffee)",
+        "variantTitle": "Hainan Coffee O",
+        "available": true,
+        "itemPriceSgd": 6.9,
+        "deliveryPriceSgd": 0,
+        "deliveredTotalSgd": 6.9,
+        "deliveryVerified": true,
+        "noAddedSugar": true,
+        "quantityMatched": true,
+        "evidence": "2. Si Wan Dao Hong Gim Hainan Coffee-O (No Sugar) / 四湾岛宏锦海南咖啡(无糖) (20 sticks x 10g) Product of Sungai Rengit, Johor, Malaysia Hong Gim Si Wan Dao (Sungai Rengit) Traditional Hainan Coffee 100% pure coffee beans Coffee production by traditional method, coffee bake in wood fire. Net Weight : 120g",
+        "productUrl": "https://www.shundat.com/products/yit-foh-tenom-kopi-o-kosong-sabah-traditional-coffee?variant=45197447823539",
+        "cartUrl": "https://www.shundat.com/cart/45197447823539:1",
+        "imageUrl": "https://cdn.shopify.com/s/files/1/0676/9108/6003/files/image_Pippit_202512281611_1_resizewithwatermark.png?v=1766915954",
+        "eligible": true,
+        "score": 97.1,
+        "reasons": [
+          "In stock",
+          "No-added-sugar evidence",
+          "20-unit evidence",
+          "Singapore delivery cost verified",
+          "S$6.90 within mandate"
+        ]
+      },
+      {
+        "id": "8397162152115:45197447856307",
+        "productId": "8397162152115",
+        "variantId": "45197447856307",
+        "merchant": "Shun Dat",
+        "title": "Yit Foh Tenom Kopi O Kosong (Sabah Traditional Coffee)",
+        "variantTitle": "Penang Train Coffee",
+        "available": true,
+        "itemPriceSgd": 6.9,
+        "deliveryPriceSgd": 0,
+        "deliveredTotalSgd": 6.9,
+        "deliveryVerified": true,
+        "noAddedSugar": true,
+        "quantityMatched": true,
+        "evidence": "4. TRAIN BRAND PENANG CAP KERETA API KOPI-O KOSONG Product of Penang, Malaysia Train Brand (Cap Kereta Api) is a heritage coffee brand from Penang, established since 1950. Known for its traditional roasting methods, the brand selects premium coffee beans, roasted to perfection to create a bold and aromatic Nanyang-style black coffee. This Kopi-O Kosong (Blac",
+        "productUrl": "https://www.shundat.com/products/yit-foh-tenom-kopi-o-kosong-sabah-traditional-coffee?variant=45197447856307",
+        "cartUrl": "https://www.shundat.com/cart/45197447856307:1",
+        "imageUrl": "https://cdn.shopify.com/s/files/1/0676/9108/6003/files/image_Pippit_202512281611_1_resizewithwatermark.png?v=1766915954",
+        "eligible": true,
+        "score": 97.1,
+        "reasons": [
+          "In stock",
+          "No-added-sugar evidence",
+          "20-unit evidence",
+          "Singapore delivery cost verified",
+          "S$6.90 within mandate"
+        ]
+      },
+      {
+        "id": "8373282472115:45127352942771",
+        "productId": "8373282472115",
+        "variantId": "45127352942771",
+        "merchant": "Shun Dat",
+        "title": "Train Brand Penang Coffee O No Sugar Added",
+        "variantTitle": "434 Muar",
+        "available": true,
+        "itemPriceSgd": 7.9,
+        "deliveryPriceSgd": 0,
+        "deliveredTotalSgd": 7.9,
+        "deliveryVerified": true,
+        "noAddedSugar": true,
+        "quantityMatched": true,
+        "evidence": "2.Sin Boon Kee Penang Kopi-O Coffee (15g x 20s )新文记槟榔屿传统咖啡乌 (无糖) Product of Penang, Malaysia Penang Kopi-O (No Sugar Added) Our famous traditional black coffee made of premium selected Robusta beans, roasted and blended with our special recipe by mixing butter through the process. For those who prefer the original and authentic taste of coffee, it is best se",
+        "productUrl": "https://www.shundat.com/products/train-brand-penang-coffee-o-no-sugar-added?variant=45127352942771",
+        "cartUrl": "https://www.shundat.com/cart/45127352942771:1",
+        "imageUrl": "https://cdn.shopify.com/s/files/1/0676/9108/6003/files/sg-11134207-821g7-mgxqmr4espvue1.jpg?v=1762870349",
+        "eligible": true,
+        "score": 96.7,
+        "reasons": [
+          "In stock",
+          "No-added-sugar evidence",
+          "20-unit evidence",
+          "Singapore delivery cost verified",
+          "S$7.90 within mandate"
+        ]
+      },
+      {
+        "id": "8391284850867:45178139082931",
+        "productId": "8391284850867",
+        "variantId": "45178139082931",
+        "merchant": "Shun Dat",
+        "title": "Hainan Lao Coffee O And Products",
+        "variantTitle": "Si Wan Dao Coffee O",
+        "available": true,
+        "itemPriceSgd": 8.5,
+        "deliveryPriceSgd": 0,
+        "deliveredTotalSgd": 8.5,
+        "deliveryVerified": true,
+        "noAddedSugar": true,
+        "quantityMatched": true,
+        "evidence": "4.Si Wan Dao Hong Gim Hainan Coffee-O (No Sugar) / 四湾岛宏锦海南咖啡(无糖) (20 sticks x 10g) Product of Sungai Rengit, Johor, Malaysia SINGAPORE NATIONAL DAY SUPER SALE : $8.50 Hong Gim Si Wan Dao (Sungai Rengit) Traditional Hainan Coffee 100% pure coffee beans Coffee production by traditional method, coffee bake in wood fire. 宏锦咖啡企业 100%纯咖啡豆 以木材生火方式烘培 保持阿公和爸爸延续下来的传统，",
+        "productUrl": "https://www.shundat.com/products/hainan-lao-coffee-o-and-products?variant=45178139082931",
+        "cartUrl": "https://www.shundat.com/cart/45178139082931:1",
+        "imageUrl": "https://cdn.shopify.com/s/files/1/0676/9108/6003/files/6767_34ff7623-6c92-4798-ada6-94727c122d10.png?v=1766032502",
+        "eligible": true,
+        "score": 96.5,
+        "reasons": [
+          "In stock",
+          "No-added-sugar evidence",
+          "20-unit evidence",
+          "Singapore delivery cost verified",
+          "S$8.50 within mandate"
+        ]
+      },
+      {
+        "id": "8397162152115:45197447790771",
+        "productId": "8397162152115",
+        "variantId": "45197447790771",
+        "merchant": "Shun Dat",
+        "title": "Yit Foh Tenom Kopi O Kosong (Sabah Traditional Coffee)",
+        "variantTitle": "Si Wan Dao Coffee o",
+        "available": true,
+        "itemPriceSgd": 8.9,
+        "deliveryPriceSgd": 0,
+        "deliveredTotalSgd": 8.9,
+        "deliveryVerified": true,
+        "noAddedSugar": true,
+        "quantityMatched": true,
+        "evidence": "2. Si Wan Dao Hong Gim Hainan Coffee-O (No Sugar) / 四湾岛宏锦海南咖啡(无糖) (20 sticks x 10g) Product of Sungai Rengit, Johor, Malaysia Hong Gim Si Wan Dao (Sungai Rengit) Traditional Hainan Coffee 100% pure coffee beans Coffee production by traditional method, coffee bake in wood fire. Net Weight : 120g",
+        "productUrl": "https://www.shundat.com/products/yit-foh-tenom-kopi-o-kosong-sabah-traditional-coffee?variant=45197447790771",
+        "cartUrl": "https://www.shundat.com/cart/45197447790771:1",
+        "imageUrl": "https://cdn.shopify.com/s/files/1/0676/9108/6003/files/image_Pippit_202512281611_1_resizewithwatermark.png?v=1766915954",
+        "eligible": true,
+        "score": 96.3,
+        "reasons": [
+          "In stock",
+          "No-added-sugar evidence",
+          "20-unit evidence",
+          "Singapore delivery cost verified",
+          "S$8.90 within mandate"
+        ]
+      }
+    ],
+    "selected": {
+      "id": "8373282472115:45127352844467",
+      "productId": "8373282472115",
+      "variantId": "45127352844467",
+      "merchant": "Shun Dat",
+      "title": "Train Brand Penang Coffee O No Sugar Added",
+      "variantTitle": "Train Coffee O",
+      "available": true,
+      "itemPriceSgd": 6.5,
+      "deliveryPriceSgd": 0,
+      "deliveredTotalSgd": 6.5,
+      "deliveryVerified": true,
+      "noAddedSugar": true,
+      "quantityMatched": true,
+      "evidence": "1.TRAIN BRAND PENANG CAP KERETA API KOPI-O KOSONG (12g x 20 Sachets) Product of Penang, Malaysia Train Brand (Cap Kereta Api) is a heritage coffee brand from Penang, established since 1950. Known for its traditional roasting methods, the brand selects premium coffee beans, roasted to perfection to create a bold and aromatic Nanyang-style black coffee. This K",
+      "productUrl": "https://www.shundat.com/products/train-brand-penang-coffee-o-no-sugar-added?variant=45127352844467",
+      "cartUrl": "https://www.shundat.com/cart/45127352844467:1",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0676/9108/6003/files/sg-11134207-821g7-mgxqmr4espvue1.jpg?v=1762870349",
+      "eligible": true,
+      "score": 97.3,
+      "reasons": [
+        "Selected: highest compliance score, then lowest delivered total",
+        "In stock",
+        "No-added-sugar evidence",
+        "20-unit evidence",
+        "Singapore delivery cost verified",
+        "S$6.50 within mandate"
+      ]
+    }
+  },
+  "payment": {
+    "version": "done-x402-proof-v1",
+    "proofId": "done-195d69332d96",
+    "issuedAt": "2026-08-16T05:57:51.063Z",
+    "environment": "sponsor-sandbox",
+    "capability": "StraitsX sandbox card issuance",
+    "http": {
+      "initialStatus": 402,
+      "challengeHeader": "PAYMENT-REQUIRED",
+      "retryHeader": "PAYMENT-SIGNATURE",
+      "protocolVersion": 1,
+      "scheme": "exact"
+    },
+    "authorization": {
+      "transferMethod": "eip3009",
+      "expiresAt": "2026-08-16T06:02:13.000Z",
+      "nonceHash": "36d8d65cfd72e00c272fad141ffc53db12b3dbda0192cac015c734c3246c0edb"
+    },
+    "payment": {
+      "amountSgd": 6.5,
+      "atomicAmount": "6500000",
+      "token": "test XSGD",
+      "tokenContract": "0xd769410dc8772695A7f55a304d2125320A65c2a5",
+      "payer": "0x701cBCd4cD9e1F49178c1cc2E62504d9122E032A",
+      "payTo": "0x99a2B2962a6AC463FBe04664027Fdb3F68bd4Cc8"
+    },
+    "settlement": {
+      "network": "Avalanche Fuji C-Chain",
+      "chainId": 43113,
+      "status": "confirmed",
+      "transactionHash": "0x195d69332d96bc8109ddd6f16bf55aaa95e968301d75951e69f7d5fd3733cb5d",
+      "blockNumber": 57786809,
+      "transferEventVerified": true,
+      "explorerUrl": "https://testnet.snowtrace.io/tx/0x195d69332d96bc8109ddd6f16bf55aaa95e968301d75951e69f7d5fd3733cb5d"
+    },
+    "card": {
+      "environment": "sandbox",
+      "issued": true,
+      "canSpendRealMoney": false,
+      "opaqueIdHash": "e735b088d240d88b70cae1f1b14bdc833f7387dd847bca4803c22d58c6be6492"
+    },
+    "mainnet": {
+      "xsgdBalance": "30",
+      "tokenContract": "0xb2F85b7AB3c2b6f62DF06dE6aE7D09c010a5096E",
+      "action": "not-submitted"
+    }
+  },
+  "aws": {
+    "version": "done-order-audit-result-v1",
+    "outcome": "stored",
+    "orderId": "DONE-X402-195D69332D96",
+    "payloadSha256": "e5f88164bf458c91a2298e1e9e00b2d7a2b9d24ec3f87838c7bd791dcc851152",
+    "recordKeyHash": "54ee0a741179f9a941e0c38b79a0d9938f9da75f3d41cccc03629c39daafe9d5",
+    "requestId": "cfdba010-cb0e-4ea6-a055-d9b5979e84c8",
+    "functionName": "done-order-audit",
+    "tableName": "done-order-audit",
+    "logGroupName": "/aws/lambda/done-order-audit",
+    "region": "ap-southeast-1",
+    "stackName": "done-phase4"
+  },
+  "receipt": {
+    "status": "execution-confirmed",
+    "selectedProduct": "Train Coffee O",
+    "merchant": "Shun Dat",
+    "amountSgd": 6.5,
+    "productUrl": "https://www.shundat.com/products/train-brand-penang-coffee-o-no-sugar-added?variant=45127352844467",
+    "cartUrl": "https://www.shundat.com/cart/45127352844467:1",
+    "cartPrepared": true,
+    "physicalOrderPlaced": false,
+    "note": "A real Shopify cart handoff was prepared. Physical checkout remains unavailable because the sponsor-issued card is sandbox-only."
+  },
   "events": [
     {
-      "at": "2026-08-16T05:29:41.365Z",
-      "stage": "listening",
-      "title": "iMessage agent connected",
-      "detail": "Waiting for a new customer outcome",
+      "at": "2026-08-16T05:57:18.453Z",
+      "stage": "intent",
+      "title": "OpenAI interpreted the outcome",
+      "detail": "Source 20 sachets of no-added-sugar coffee for delivery to the saved SMU address, keeping the total under S$12.",
+      "kind": "complete"
+    },
+    {
+      "at": "2026-08-16T05:57:18.453Z",
+      "stage": "approval-required",
+      "title": "Bounded permission requested",
+      "detail": "One use, up to S$12.00",
+      "kind": "active"
+    },
+    {
+      "at": "2026-08-16T05:57:25.971Z",
+      "stage": "discovering",
+      "title": "Explicit iMessage approval received",
+      "detail": "Searching within the S$12.00 mandate",
+      "kind": "complete"
+    },
+    {
+      "at": "2026-08-16T05:57:26.801Z",
+      "stage": "selected",
+      "title": "Live Shopify result selected",
+      "detail": "Train Coffee O · S$6.50 delivered · score 97.3",
+      "kind": "complete"
+    },
+    {
+      "at": "2026-08-16T05:57:26.907Z",
+      "stage": "paying",
+      "title": "x402 payment started",
+      "detail": "Exact S$6.50 test-XSGD authorization",
+      "kind": "active"
+    },
+    {
+      "at": "2026-08-16T05:57:51.069Z",
+      "stage": "paid",
+      "title": "Avalanche Fuji settlement confirmed",
+      "detail": "0x195d69332d96bc8109ddd6f16bf55aaa95e968301d75951e69f7d5fd3733cb5d",
+      "kind": "complete"
+    },
+    {
+      "at": "2026-08-16T05:57:51.071Z",
+      "stage": "aws",
+      "title": "AWS audit started",
+      "detail": "Lambda validating discovery, mandate, and payment evidence",
+      "kind": "active"
+    },
+    {
+      "at": "2026-08-16T05:57:58.193Z",
+      "stage": "complete",
+      "title": "Execution receipt ready",
+      "detail": "Train Coffee O · AWS cfdba010-cb0e-4ea6-a055-d9b5979e84c8",
       "kind": "complete"
     }
   ],
-  "updatedAt": "2026-08-16T05:29:41.365Z"
+  "updatedAt": "2026-08-16T05:57:58.193Z"
 }

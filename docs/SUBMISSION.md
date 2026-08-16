@@ -6,7 +6,7 @@
 - Live evidence console: https://done-agentic-commerce.vercel.app/live
 - Architecture: https://done-agentic-commerce.vercel.app/architecture
 - Source: https://github.com/13shreyansh/done-agentic-commerce
-- Latest on-chain proof: https://testnet.snowtrace.io/tx/0xe27f11579a800f96d02438cdc2cd823c4dd780d6b6d16b6c56a8cbe82f586914
+- Latest on-chain proof: https://testnet.snowtrace.io/tx/0x195d69332d96bc8109ddd6f16bf55aaa95e968301d75951e69f7d5fd3733cb5d
 
 ## What the judge should see
 

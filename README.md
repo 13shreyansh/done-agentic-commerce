@@ -2,7 +2,7 @@
 
 > **Don’t buy products. Buy outcomes.**
 
-[Product demo](https://done-agentic-commerce.vercel.app/) · [Live evidence console](https://done-agentic-commerce.vercel.app/live) · [Architecture](https://done-agentic-commerce.vercel.app/architecture) · [Latest Fuji proof](https://testnet.snowtrace.io/tx/0xe27f11579a800f96d02438cdc2cd823c4dd780d6b6d16b6c56a8cbe82f586914)
+[Product demo](https://done-agentic-commerce.vercel.app/) · [Live evidence console](https://done-agentic-commerce.vercel.app/live) · [Architecture](https://done-agentic-commerce.vercel.app/architecture) · [Latest Fuji proof](https://testnet.snowtrace.io/tx/0x195d69332d96bc8109ddd6f16bf55aaa95e968301d75951e69f7d5fd3733cb5d)
 
 DONE is a bounded autonomous-commerce agent for Singapore. A customer asks for an outcome in ordinary language, sets a maximum spend, and approves once. DONE then discovers live merchant products, applies a public selection policy, pays the exact selected total through StraitsX x402 on Avalanche Fuji, records the execution in AWS, and returns an inspectable receipt.
 
@@ -50,7 +50,7 @@ The editable source is [`architecture.drawio`](architecture.drawio).
 | Hosted Messages-style walkthrough | **Simulated presentation** | [Product demo](https://done-agentic-commerce.vercel.app/) |
 | Dynamic approval and idempotent order engine | **Implemented** | [`app/page.tsx`](app/page.tsx), [`POST /api/orders`](app/api/orders/route.ts) |
 | HTTP 402 + EIP-3009 authorization | **Executed in sponsor sandbox** | [`phase3-proof.json`](public/phase3-proof.json) |
-| Fuji test-XSGD settlement | **Confirmed on-chain** | [Snowtrace](https://testnet.snowtrace.io/tx/0xe27f11579a800f96d02438cdc2cd823c4dd780d6b6d16b6c56a8cbe82f586914) |
+| Fuji test-XSGD settlement | **Confirmed on-chain** | [Snowtrace](https://testnet.snowtrace.io/tx/0x195d69332d96bc8109ddd6f16bf55aaa95e968301d75951e69f7d5fd3733cb5d) |
 | Lambda + DynamoDB + CloudWatch/X-Ray | **Executed in event AWS account** | [`phase4-proof.json`](public/phase4-proof.json) |
 | Merchant handoff | **Real Shopify cart prepared** | Cart URL appears in a completed live receipt |
 | Physical retail purchase | **Not claimed** | Sponsor-issued card is explicitly non-spendable sandbox capability |
