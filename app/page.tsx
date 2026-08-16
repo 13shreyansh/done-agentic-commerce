@@ -299,6 +299,7 @@ export default function Home() {
   const [requestText, setRequestText] = useState("");
   const [answerText, setAnswerText] = useState("");
   const [autoplay, setAutoplay] = useState(false);
+  const [introVisible, setIntroVisible] = useState(true);
   const [nativeDevice, setNativeDevice] = useState(false);
   const [proofOpen, setProofOpen] = useState(false);
   const [orderResult, setOrderResult] = useState<OrderResult | null>(null);
@@ -467,6 +468,10 @@ export default function Home() {
     later(() => void beginOrder(APPROVAL, REQUEST), 2600);
   }, [beginOrder, later, reset]);
 
+  const startSimulation = useCallback(() => {
+    setIntroVisible(false);
+  }, []);
+
   useEffect(() => {
     const onAppleMobile = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const narrowTouchDevice = navigator.maxTouchPoints > 1 && window.innerWidth < 700;
@@ -477,12 +482,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const autoplayTimer = window.setTimeout(play, 650);
-    return () => {
-      window.clearTimeout(autoplayTimer);
-      clearTimers();
-    };
-  }, [clearTimers, play]);
+    if (introVisible) {
+      const introTimer = window.setTimeout(startSimulation, 6000);
+      return () => window.clearTimeout(introTimer);
+    }
+    const autoplayTimer = window.setTimeout(play, 120);
+    return () => window.clearTimeout(autoplayTimer);
+  }, [introVisible, play, startSimulation]);
 
   useEffect(() => {
     if (!autoplay || stage !== "ordered" || !orderResult) return;
@@ -526,6 +532,19 @@ export default function Home() {
 
   return (
     <main className={`demo-shell${nativeDevice ? " native-device" : ""}`}>
+      {introVisible && (
+        <section className="simulation-intro" role="dialog" aria-modal="true" aria-labelledby="simulation-title">
+          <div className="simulation-intro-card">
+            <div className="simulation-kicker"><span /> BEFORE THE DEMO</div>
+            <h2 id="simulation-title">You’re about to watch a simulated experience.</h2>
+            <p>The real experience begins after the customer connects <b>iMessage</b> and a <b>user-controlled wallet</b>. Those private connections cannot be exposed in a public judge demo.</p>
+            <p>What follows shows exactly how it will feel: ask for an outcome, approve one spending limit, receive the order, and inspect the payment proof.</p>
+            <button onClick={startSimulation}>Watch the simulation <span>→</span></button>
+            <div className="intro-progress" aria-hidden="true"><i /></div>
+            <small>Starting automatically in a few seconds</small>
+          </div>
+        </section>
+      )}
       <section className="presentation-copy">
         <div className="eyebrow"><span /> LIVE DEMO · IMESSAGE SIMULATION</div>
         <h1>Ask.<br />Approve.<br /><em>Done.</em></h1>
