@@ -1,0 +1,35 @@
+{
+  "version": "done-mainnet-xsgd-proof-v1",
+  "generatedAt": "2026-08-16T06:19:44.316Z",
+  "environment": "mainnet",
+  "classification": "controlled-wallet XSGD transfer; not a physical merchant purchase or production x402 payment",
+  "network": {
+    "name": "Avalanche C-Chain",
+    "chainId": 43114
+  },
+  "token": {
+    "symbol": "XSGD",
+    "contract": "0xb2F85b7AB3c2b6f62DF06dE6aE7D09c010a5096E",
+    "decimals": 6
+  },
+  "transfer": {
+    "from": "0x701cBCd4cD9e1F49178c1cc2E62504d9122E032A",
+    "to": "0xA60272005A998be986D07848465041d800C28B9F",
+    "amount": "0.1",
+    "transactionHash": "0x7cad6ef81b1bd4e35860f2d4351098d964d776a4513df02491f338200faba2f5",
+    "blockNumber": 92926553,
+    "blockHash": "0xcf9badb0241c23c962b522de799cadcc9cd9ea5c0238d451d8e808afe8b7e606",
+    "explorerUrl": "https://snowtrace.io/tx/0x7cad6ef81b1bd4e35860f2d4351098d964d776a4513df02491f338200faba2f5",
+    "transferEventVerified": true
+  },
+  "balances": {
+    "senderBefore": "30.0",
+    "senderAfter": "29.9",
+    "recipientBefore": "0.0",
+    "recipientAfter": "0.1"
+  },
+  "gas": {
+    "gasUsed": "62437",
+    "feeAvax": "0.000004148529125717"
+  }
+}

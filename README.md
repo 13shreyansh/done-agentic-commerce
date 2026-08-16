@@ -2,7 +2,7 @@
 
 > **Don’t buy products. Buy outcomes.**
 
-[Product demo](https://done-agentic-commerce.vercel.app/) · [Live evidence console](https://done-agentic-commerce.vercel.app/live) · [Architecture](https://done-agentic-commerce.vercel.app/architecture) · [Latest Fuji proof](https://testnet.snowtrace.io/tx/0x195d69332d96bc8109ddd6f16bf55aaa95e968301d75951e69f7d5fd3733cb5d)
+[Product demo](https://done-agentic-commerce.vercel.app/) · [Live evidence console](https://done-agentic-commerce.vercel.app/live) · [Architecture](https://done-agentic-commerce.vercel.app/architecture) · [Mainnet XSGD proof](https://snowtrace.io/tx/0x7cad6ef81b1bd4e35860f2d4351098d964d776a4513df02491f338200faba2f5) · [Fuji x402 proof](https://testnet.snowtrace.io/tx/0x195d69332d96bc8109ddd6f16bf55aaa95e968301d75951e69f7d5fd3733cb5d)
 
 DONE is a bounded autonomous-commerce agent for Singapore. A customer asks for an outcome in ordinary language, sets a maximum spend, and approves once. DONE then discovers live merchant products, applies a public selection policy, pays the exact selected total through StraitsX x402 on Avalanche Fuji, records the execution in AWS, and returns an inspectable receipt.
 
@@ -51,11 +51,12 @@ The editable source is [`architecture.drawio`](architecture.drawio).
 | Dynamic approval and idempotent order engine | **Implemented** | [`app/page.tsx`](app/page.tsx), [`POST /api/orders`](app/api/orders/route.ts) |
 | HTTP 402 + EIP-3009 authorization | **Executed in sponsor sandbox** | [`phase3-proof.json`](public/phase3-proof.json) |
 | Fuji test-XSGD settlement | **Confirmed on-chain** | [Snowtrace](https://testnet.snowtrace.io/tx/0x195d69332d96bc8109ddd6f16bf55aaa95e968301d75951e69f7d5fd3733cb5d) |
+| Avalanche mainnet XSGD transfer | **Confirmed on-chain** | [`mainnet-proof.json`](public/mainnet-proof.json) · [Snowtrace](https://snowtrace.io/tx/0x7cad6ef81b1bd4e35860f2d4351098d964d776a4513df02491f338200faba2f5) |
 | Lambda + DynamoDB + CloudWatch/X-Ray | **Executed in event AWS account** | [`phase4-proof.json`](public/phase4-proof.json) |
 | Merchant handoff | **Real Shopify cart prepared** | Cart URL appears in a completed live receipt |
 | Physical retail purchase | **Not claimed** | Sponsor-issued card is explicitly non-spendable sandbox capability |
 
-No mainnet payment is made by the demo. The user's real XSGD balance and all wallet secrets remain outside Vercel, OpenAI, and AWS.
+A separately approved `0.10 XSGD` wallet-to-wallet transfer is confirmed on Avalanche mainnet. It demonstrates real-value settlement, but is deliberately not described as a retail coffee order or production x402 merchant charge. Wallet secrets remain outside Vercel, OpenAI, AWS, and the repository.
 
 ## Security invariants
 
@@ -118,6 +119,7 @@ public/BEST.md               Human-readable autonomous-selection policy
 public/live-execution.json   Sanitized state consumed by the live console
 public/phase3-proof.json     Sanitized x402 + Avalanche execution proof
 public/phase4-proof.json     Sanitized AWS execution and replay proof
+public/mainnet-proof.json    Sanitized real-XSGD mainnet transfer proof
 docs/architecture.svg        GitHub-rendered architecture
 architecture.drawio          Editable architecture source
 ```
