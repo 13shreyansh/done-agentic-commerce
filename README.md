@@ -25,7 +25,8 @@ The current build includes a deterministic commerce engine, hard constraint enfo
 | HTTP 402 challenge and EIP-3009 authorization | Executed in the StraitsX sponsor sandbox | [`phase3-proof.json`](public/phase3-proof.json) |
 | 10 test XSGD settlement on Avalanche Fuji | Confirmed on-chain | [Snowtrace transaction](https://testnet.snowtrace.io/tx/0x920f3ee1e61ec5cfac585a86aaf1261dbcc7bab1ec1587e449bac86fd2031335) |
 | Card and merchant checkout | Sandbox | Clearly labelled in the interface |
-| iMessage bridge and AWS orchestration | Designed next phase | Shown as planned in the architecture diagram |
+| AWS execution audit | Implemented | Lambda validation, DynamoDB idempotency, and CloudWatch evidence in [`phase4-proof.json`](public/phase4-proof.json) |
+| iMessage experience | Public simulation | The live site clearly simulates the intended Messages + local-wallet integration |
 
 No real-money merchant purchase is claimed. Mainnet funds were not submitted to the demo flow.
 

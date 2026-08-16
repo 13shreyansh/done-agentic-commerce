@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { isAwsProof, type AwsProof } from "@/lib/aws/types";
 import type { OrderResult, PurchaseCommand } from "@/lib/commerce/types";
 import { isPaymentProof, type PaymentProof } from "@/lib/payments/types";
 
 const REQUEST =
-  "Buy 20 sachets of sugar-free kopi for the office. Deliver them to my saved SMU address. You may spend up to S$10 and complete one purchase without asking again.";
+  "Find me 20 sachets of no-added-sugar kopi. Deliver them to my saved SMU address. Keep the total under S$12.";
 
-const PERMISSION = "Do I have your permission to spend up to S$10 from your XSGD wallet?";
+const PERMISSION = "Do I have your permission to spend up to S$12 from your XSGD wallet?";
 const APPROVAL = "Yes";
 
 type Stage = "compose" | "asking" | "permission" | "ordering" | "ordered";
@@ -64,9 +65,10 @@ function PermissionBubble() {
 
 const formatSgd = (value: number) => `S$${value.toFixed(2)}`;
 
-function ReceiptCard({ result, paymentProof, onProof }: {
+function ReceiptCard({ result, paymentProof, awsProof, onProof }: {
   result: OrderResult;
   paymentProof: PaymentProof | null;
+  awsProof: AwsProof | null;
   onProof: () => void;
 }) {
   const product = result.selected.product;
@@ -78,10 +80,10 @@ function ReceiptCard({ result, paymentProof, onProof }: {
           alt={product.name}
         />
         <div className="order-check" aria-hidden="true">✓</div>
-        <span className="receipt-mode">{paymentProof ? "TEST XSGD · MERCHANT SANDBOX" : "MERCHANT SANDBOX"}</span>
+        <span className="receipt-mode">{awsProof ? "TEST XSGD · AWS-AUDITED SANDBOX" : paymentProof ? "TEST XSGD · MERCHANT SANDBOX" : "MERCHANT SANDBOX"}</span>
       </div>
       <div className="receipt-body">
-        <div className="ordered-label">ORDERED{paymentProof ? " · PAYMENT PROVED" : ""}</div>
+        <div className="ordered-label">ORDERED{awsProof ? " · EXECUTION AUDITED" : paymentProof ? " · PAYMENT PROVED" : ""}</div>
         <h2>{product.name}</h2>
         <p className="product-detail">{product.description}</p>
         <div className="receipt-divider" />
@@ -134,9 +136,45 @@ function PaymentEvidence({ proof }: { proof: PaymentProof | null }) {
   );
 }
 
-function ProofSheet({ result, paymentProof, replayStatus, onReplay, onClose }: {
+function AwsEvidence({ proof }: { proof: AwsProof | null }) {
+  if (!proof) {
+    return (
+      <section className="aws-evidence pending">
+        <div className="aws-title"><div><span>AWS EXECUTION BOUNDARY</span><b>Deployment evidence pending</b></div><em>READY</em></div>
+        <p>The customer flow still works locally; run the Phase 4 verifier to attach validated execution, duplicate prevention, and operational evidence.</p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="aws-evidence">
+      <div className="aws-title">
+        <div><span>LIVE AWS EXECUTION PROOF</span><b>{proof.region} · {proof.stackStatus}</b></div>
+        <em>VERIFIED</em>
+      </div>
+      <div className="aws-flow" aria-label="AWS architecture flow">
+        {proof.architecture.map((component, index) => (
+          <div key={component.service}>
+            <i>{index + 1}</i>
+            <p><b>{component.service.replace("Amazon ", "")}</b><span>{component.role}</span></p>
+            <em>✓</em>
+          </div>
+        ))}
+      </div>
+      <div className="aws-invocations">
+        <div><span>First invocation</span><b>{proof.execution.firstOutcome === "stored" ? "Validated + stored" : "Validated replay"}</b><em>{compact(proof.execution.firstRequestId, 9, 6)}</em></div>
+        <div><span>Same request retried</span><b>Duplicate blocked</b><em>{compact(proof.execution.replayRequestId, 9, 6)}</em></div>
+        <div><span>Evidence integrity</span><b>SHA-256 matched</b><em>{compact(proof.execution.payloadSha256, 10, 8)}</em></div>
+      </div>
+      <p className="aws-security-note"><b>Isolation verified:</b> least-privilege role, encrypted recoverable audit record, seven-day logs, and active tracing. AWS received no wallet key, card data, or mainnet funds.</p>
+    </section>
+  );
+}
+
+function ProofSheet({ result, paymentProof, awsProof, replayStatus, onReplay, onClose }: {
   result: OrderResult;
   paymentProof: PaymentProof | null;
+  awsProof: AwsProof | null;
   replayStatus: ReplayStatus;
   onReplay: () => void;
   onClose: () => void;
@@ -163,16 +201,22 @@ function ProofSheet({ result, paymentProof, replayStatus, onReplay, onClose }: {
       state: paymentProof ? "Verified" : "Testnet",
       tone: paymentProof ? "green" : "blue",
     },
+    {
+      label: "AWS execution",
+      value: awsProof ? `Lambda · DynamoDB · ${awsProof.region}` : "Validated boundary pending",
+      state: awsProof ? "Audited" : "Ready",
+      tone: awsProof ? "green" : "amber",
+    },
   ];
 
   return (
     <div className="proof-overlay" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section className="proof-sheet" role="dialog" aria-modal="true" aria-labelledby="proof-title">
         <div className="proof-header">
-          <div><span>PHASE 3 · PAYMENT {paymentProof ? "CONNECTED" : "READY"}</span><h2 id="proof-title">Order proof</h2></div>
+          <div><span>PHASE 4 · AWS {awsProof ? "CONNECTED" : "READY"}</span><h2 id="proof-title">Order proof</h2></div>
           <button onClick={onClose} aria-label="Close order proof">×</button>
         </div>
-        <p className="proof-intro">The conversation stayed simple. This panel exposes the real local decision, mandate, and merchant-sandbox evidence behind it.</p>
+        <p className="proof-intro">The conversation stayed simple. This panel exposes the decision, bounded authority, payment, merchant-sandbox result, and verified AWS execution evidence behind it.</p>
         <div className="proof-rows">
           {proofRows.map((row) => (
             <div className="proof-row" key={row.label}>
@@ -204,13 +248,14 @@ function ProofSheet({ result, paymentProof, replayStatus, onReplay, onClose }: {
           <p>One order from {result.mandate.merchantScope} · Total ≤ {formatSgd(result.mandate.maxSpendSgd)} · {result.mandate.deliveryAddressLabel} · Expires after use</p>
         </div>
         <PaymentEvidence proof={paymentProof} />
+        <AwsEvidence proof={awsProof} />
         <button className={`replay-test ${replayStatus}`} onClick={onReplay} disabled={replayStatus === "checking" || replayStatus === "confirmed"}>
           {replayStatus === "checking" && "Replaying the same request…"}
           {replayStatus === "confirmed" && `✓ Duplicate blocked — ${result.order.id} returned`}
           {replayStatus === "error" && "Retry duplicate-protection test"}
           {replayStatus === "idle" && "Test duplicate protection"}
         </button>
-        <p className="proof-footnote">The merchant order is a clearly labeled sandbox result. The x402 evidence is {paymentProof ? "a live StraitsX sponsor-sandbox settlement using Fuji test XSGD" : "not yet settled"}; no real card purchase or mainnet payment is claimed.</p>
+        <p className="proof-footnote">The merchant order is a clearly labeled sandbox result. The x402 evidence is {paymentProof ? "a live StraitsX sponsor-sandbox settlement using Fuji test XSGD" : "not yet settled"}. AWS {awsProof ? "validated and audited that evidence" : "is not yet attached"}; no real card purchase or mainnet payment is claimed.</p>
       </section>
     </div>
   );
@@ -261,6 +306,7 @@ export default function Home() {
   const [orderError, setOrderError] = useState("");
   const [replayStatus, setReplayStatus] = useState<ReplayStatus>("idle");
   const [paymentProof, setPaymentProof] = useState<PaymentProof | null>(null);
+  const [awsProof, setAwsProof] = useState<AwsProof | null>(null);
   const timers = useRef<number[]>([]);
   const threadRef = useRef<HTMLDivElement>(null);
   const idempotencyKeyRef = useRef("");
@@ -275,6 +321,17 @@ export default function Home() {
       if (isPaymentProof(body)) setPaymentProof(body);
     } catch {
       // A missing proof is an intentional pre-activation state, not a customer-facing failure.
+    }
+  }, []);
+
+  const loadAwsProof = useCallback(async () => {
+    try {
+      const response = await fetch(`/phase4-proof.json?t=${Date.now()}`, { cache: "no-store" });
+      if (!response.ok) return;
+      const body: unknown = await response.json();
+      if (isAwsProof(body)) setAwsProof(body);
+    } catch {
+      // The pending proof file is a valid pre-deployment state.
     }
   }, []);
 
@@ -318,7 +375,7 @@ export default function Home() {
 
   const beginOrder = useCallback(async (text = APPROVAL, rawRequest = REQUEST) => {
     if (!/\b(yes|approve|approved|proceed|go ahead)\b/i.test(text)) {
-      setApprovalError("Please reply Yes to approve the S$10 ceiling, or restart to cancel.");
+      setApprovalError("Please reply Yes to approve the S$12 ceiling, or restart to cancel.");
       return;
     }
 
@@ -332,12 +389,12 @@ export default function Home() {
         noAddedSugar: true,
         deliveryAddressLabel: "SMU · Saved address",
         deliveryRegion: "SG",
-        maxTotalSgd: 10,
+        maxTotalSgd: 12,
       },
       approval: {
         approved: true,
         approvalText: text,
-        maxSpendSgd: 10,
+        maxSpendSgd: 12,
       },
       idempotencyKey,
     };
@@ -420,20 +477,33 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const autoplayTimer = params.get("autoplay") === "1"
-      ? window.setTimeout(play, 0)
-      : undefined;
+    const autoplayTimer = window.setTimeout(play, 650);
     return () => {
-      if (autoplayTimer !== undefined) window.clearTimeout(autoplayTimer);
+      window.clearTimeout(autoplayTimer);
       clearTimers();
     };
   }, [clearTimers, play]);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => void loadPaymentProof(), 0);
+    if (!autoplay || stage !== "ordered" || !orderResult) return;
+    const revealProof = window.setTimeout(() => setProofOpen(true), 1800);
+    const replayLoop = window.setTimeout(() => {
+      setProofOpen(false);
+      play();
+    }, 8500);
+    return () => {
+      window.clearTimeout(revealProof);
+      window.clearTimeout(replayLoop);
+    };
+  }, [autoplay, orderResult, play, stage]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void loadPaymentProof();
+      void loadAwsProof();
+    }, 0);
     return () => window.clearTimeout(timer);
-  }, [loadPaymentProof]);
+  }, [loadAwsProof, loadPaymentProof]);
 
   useEffect(() => {
     later(() => threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight, behavior: "smooth" }), 80);
@@ -444,7 +514,7 @@ export default function Home() {
     const onKeyDown = (event: KeyboardEvent) => event.key === "Escape" && setProofOpen(false);
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [loadPaymentProof, proofOpen]);
+  }, [proofOpen]);
 
   const flowPosition = stage === "compose" || stage === "asking"
     ? 0
@@ -457,11 +527,12 @@ export default function Home() {
   return (
     <main className={`demo-shell${nativeDevice ? " native-device" : ""}`}>
       <section className="presentation-copy">
-        <div className="eyebrow"><span /> PHASE 3 · X402 {paymentProof ? "CONNECTED" : "READY"}</div>
+        <div className="eyebrow"><span /> LIVE DEMO · IMESSAGE SIMULATION</div>
         <h1>Ask.<br />Approve.<br /><em>Done.</em></h1>
-        <p>DONE asks once for a spending ceiling, then completes the outcome without interrupting you again.</p>
+        <p>This public demo simulates the experience of DONE connected to Apple Messages and a user-controlled wallet. It asks once for a spending ceiling, completes the outcome, and exposes the order and payment proof.</p>
+        <div className="simulation-note"><b>Simulation boundary</b> The conversation is rendered here for judges. In the real-world design, Messages is the interface and the wallet signs locally—private keys never enter this website or the model.</div>
         <div className="demo-actions">
-          <button className="play-demo" onClick={play}><span>▶</span> Play full demo</button>
+          <button className="play-demo" onClick={play}><span>▶</span> Replay iMessage loop</button>
           <button className="restart-demo" onClick={reset}>Restart</button>
         </div>
         <div className="step-line" aria-label="Demo flow">
@@ -470,10 +541,10 @@ export default function Home() {
           <span className={flowClass(2)}>Ordered</span>
         </div>
         <div className="checkpoint-card">
-          <span>PHASE 3 CHECKPOINT</span>
-          <div><i>01</i><p><b>Real HTTP 402</b>The sponsor endpoint returns machine-readable payment terms.</p></div>
-          <div><i>02</i><p><b>Local bounded signing</b>Only exact Fuji test XSGD terms can be authorized.</p></div>
-          <div><i>03</i><p><b>On-chain proof</b>A verified Transfer event and sandbox card receipt complete the rail.</p></div>
+          <span>PHASE 4 CHECKPOINT</span>
+          <div><i>01</i><p><b>Validated Lambda execution</b>The boundary rejects evidence outside the approved order, budget, merchant, and Fuji payment.</p></div>
+          <div><i>02</i><p><b>Idempotent DynamoDB audit</b>A conditional write makes the same mandate safe to retry without duplicate execution.</p></div>
+          <div><i>03</i><p><b>CloudWatch evidence</b>Retained logs and active tracing make the execution inspectable.</p></div>
         </div>
       </section>
 
@@ -496,8 +567,9 @@ export default function Home() {
               )}
               {stage === "ordering" && <TypingBubble />}
               {stage === "ordered" && orderResult && (
-                <div className="row incoming-row receipt-row"><ReceiptCard result={orderResult} paymentProof={paymentProof} onProof={() => {
+                <div className="row incoming-row receipt-row"><ReceiptCard result={orderResult} paymentProof={paymentProof} awsProof={awsProof} onProof={() => {
                   void loadPaymentProof();
+                  void loadAwsProof();
                   setProofOpen(true);
                 }} /></div>
               )}
@@ -517,6 +589,7 @@ export default function Home() {
         <ProofSheet
           result={orderResult}
           paymentProof={paymentProof}
+          awsProof={awsProof}
           replayStatus={replayStatus}
           onReplay={() => void replayOrder()}
           onClose={() => setProofOpen(false)}
