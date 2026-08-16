@@ -48,7 +48,7 @@
         <mxCell id="e10" value="secure relay" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#629CFF;fontColor=#AFCBFF;fontSize=10;endArrow=block;endFill=1;strokeWidth=2;dashed=1;" edge="1" parent="1" source="imessage" target="iot"><mxGeometry relative="1" as="geometry"/></mxCell>
 
         <mxCell id="footer" value="TRUST BOUNDARY · Private keys, PAN/CVV, OTPs and full delivery addresses never enter the model or public UI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0D3022;strokeColor=#22E39A;fontColor=#D7F9E8;fontStyle=1;fontSize=14;align=center;" vertex="1" parent="1"><mxGeometry x="70" y="920" width="1775" height="65" as="geometry"/></mxCell>
-        <mxCell id="footnote" value="Truthful state: interface + commerce engine + idempotency + executed x402/Fuji proof. AWS and native iMessage transport are the next production phase." style="text;html=1;strokeColor=none;fillColor=none;fontColor=#83968C;fontSize=12;align=center;" vertex="1" parent="1"><mxGeometry x="260" y="1005" width="1400" height="35" as="geometry"/></mxCell>
+        <mxCell id="footnote" value="Truthful state: interface, commerce engine, idempotency, x402/Fuji settlement, and AWS Lambda/DynamoDB/CloudWatch audit are implemented. Native iMessage and broader production orchestration remain the production direction." style="text;html=1;strokeColor=none;fillColor=none;fontColor=#83968C;fontSize=12;align=center;" vertex="1" parent="1"><mxGeometry x="260" y="1005" width="1400" height="35" as="geometry"/></mxCell>
       </root>
     </mxGraphModel>
   </diagram>
