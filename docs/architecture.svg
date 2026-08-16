@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120" role="img" aria-labelledby="title desc">
   <title id="title">DONE agentic commerce architecture</title>
-  <desc id="desc">A four-boundary architecture showing the customer experience, deterministic decision engine, executed StraitsX x402 payment on Avalanche Fuji, and implemented AWS audit path. Status labels distinguish implemented, executed, sandboxed, simulated, and planned components.</desc>
+  <desc id="desc">A four-boundary architecture showing the native iMessage experience, live Shopify discovery, deterministic decision engine, executed StraitsX x402 payment on Avalanche Fuji, and implemented AWS audit path.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#07110d"/>
@@ -71,9 +71,9 @@
     </g>
     <g transform="translate(0 58)">
       <rect width="112" height="30" rx="15" fill="#bd91ff" fill-opacity="0.1" stroke="#bd91ff"/>
-      <text x="56" y="19" text-anchor="middle" fill="#d3b5ff" class="statusText">SIMULATED UI</text>
+      <text x="56" y="19" text-anchor="middle" fill="#d3b5ff" class="statusText">LOCAL MAC</text>
       <rect x="122" width="96" height="30" rx="15" fill="#6e91ff" fill-opacity="0.08" stroke="#6e91ff" stroke-dasharray="6 5"/>
-      <text x="170" y="19" text-anchor="middle" fill="#91aaff" class="statusText">PLANNED</text>
+      <text x="170" y="19" text-anchor="middle" fill="#91aaff" class="statusText">HOSTED WEB</text>
     </g>
   </g>
 
@@ -85,18 +85,18 @@
     <text class="sectionSub" x="40" y="42">The conversation stays simple; the system underneath stays inspectable.</text>
   </g>
   <g transform="translate(430 251)">
-    <rect class="card simulated" width="300" height="126" rx="16"/>
-    <text class="eyebrow mono" x="20" y="27" fill="#d3b5ff">SIMULATED UI</text>
-    <text class="cardTitle" x="20" y="57">iMessage experience</text>
-    <text class="cardBody" x="20" y="83">Public Messages-style demo; no private</text>
-    <text class="cardBody" x="20" y="104">Apple account or phone connection.</text>
+    <rect class="card implemented" width="300" height="126" rx="16"/>
+    <text class="eyebrow mono" x="20" y="27" fill="#36efa3">IMPLEMENTED · LOCAL</text>
+    <text class="cardTitle" x="20" y="57">Native iMessage agent</text>
+    <text class="cardBody" x="20" y="83">Watches one private chat and replies</text>
+    <text class="cardBody" x="20" y="104">through the real Messages app.</text>
   </g>
   <g transform="translate(778 251)">
     <rect class="card implemented" width="300" height="126" rx="16"/>
     <text class="eyebrow mono" x="20" y="27" fill="#36efa3">IMPLEMENTED</text>
     <text class="cardTitle" x="20" y="57">Outcome request</text>
     <text class="cardBody" x="20" y="83">20 no-added-sugar coffee sachets,</text>
-    <text class="cardBody" x="20" y="104">saved SMU address, total ≤ S$12.</text>
+    <text class="cardBody" x="20" y="104">saved SMU address, customer ceiling.</text>
   </g>
   <g transform="translate(1126 251)">
     <rect class="card implemented" width="300" height="126" rx="16"/>
@@ -125,23 +125,23 @@
   <g transform="translate(640 456)">
     <rect class="card implemented" width="250" height="140" rx="16"/>
     <text class="eyebrow mono" x="18" y="27" fill="#36efa3">IMPLEMENTED</text>
-    <text class="cardTitle" x="18" y="57">BEST policy engine</text>
-    <text class="cardBody" x="18" y="83">Rejects failures, ranks delivered</text>
-    <text class="cardBody" x="18" y="104">value, publishes every reason.</text>
+    <text class="cardTitle" x="18" y="57">Live Shopify discovery</text>
+    <text class="cardBody" x="18" y="83">Fetches and fingerprints the catalogue;</text>
+    <text class="cardBody" x="18" y="104">records source, time and candidates.</text>
   </g>
   <g transform="translate(930 456)">
     <rect class="card implemented" width="250" height="140" rx="16"/>
     <text class="eyebrow mono" x="18" y="27" fill="#36efa3">IMPLEMENTED</text>
-    <text class="cardTitle" x="18" y="57">Bounded mandate</text>
-    <text class="cardBody" x="18" y="83">Exact ceiling, merchant scope,</text>
-    <text class="cardBody" x="18" y="104">expiry, and single-use key.</text>
+    <text class="cardTitle" x="18" y="57">BEST policy engine</text>
+    <text class="cardBody" x="18" y="83">Rejects hard failures, ranks delivered</text>
+    <text class="cardBody" x="18" y="104">value, publishes every reason.</text>
   </g>
   <g transform="translate(1220 456)">
     <rect class="card implemented" width="250" height="140" rx="16"/>
     <text class="eyebrow mono" x="18" y="27" fill="#36efa3">IMPLEMENTED</text>
-    <text class="cardTitle" x="18" y="57">Idempotent order API</text>
-    <text class="cardBody" x="18" y="83">The same mandate can retry</text>
-    <text class="cardBody" x="18" y="104">without a duplicate order.</text>
+    <text class="cardTitle" x="18" y="57">Bounded mandate</text>
+    <text class="cardBody" x="18" y="83">Customer ceiling, merchant scope,</text>
+    <text class="cardBody" x="18" y="104">expiry, and single-use key.</text>
   </g>
   <path class="connector" d="M600 526H632M890 526H922M1180 526H1212"/>
   <circle class="step" cx="616" cy="526" r="13"/><text class="stepText" x="616" y="530" text-anchor="middle">2</text>
@@ -154,7 +154,7 @@
   <g transform="translate(67 665)">
     <text class="sectionNum mono" x="0" y="18">03</text>
     <text class="sectionTitle" x="40" y="18">Payment + commerce</text>
-    <text class="sectionSub" x="40" y="42">A real sponsor-sandbox payment; a clearly labelled merchant sandbox.</text>
+    <text class="sectionSub" x="40" y="42">A real sponsor-sandbox payment and a real Shopify cart handoff.</text>
   </g>
   <g transform="translate(350 682)">
     <rect class="card executed" width="250" height="140" rx="16"/>
@@ -174,15 +174,15 @@
     <rect class="card executed" width="250" height="140" rx="16"/>
     <text class="eyebrow mono" x="18" y="27" fill="#7cd5ff">EXECUTED</text>
     <text class="cardTitle" x="18" y="57">Avalanche Fuji</text>
-    <text class="cardBody" x="18" y="83">10 test XSGD settled on C-Chain;</text>
+    <text class="cardBody" x="18" y="83">Exact selected test XSGD settled;</text>
     <text class="cardBody" x="18" y="104">transfer event verified on-chain.</text>
   </g>
   <g transform="translate(1220 682)">
     <rect class="card sandbox" width="250" height="140" rx="16"/>
     <text class="eyebrow mono" x="18" y="27" fill="#ffd18f">SANDBOX</text>
-    <text class="cardTitle" x="18" y="57">Card + checkout</text>
-    <text class="cardBody" x="18" y="83">Non-spendable card reference and</text>
-    <text class="cardBody" x="18" y="104">sandbox coffee fulfillment.</text>
+    <text class="cardTitle" x="18" y="57">Shopify cart handoff</text>
+    <text class="cardBody" x="18" y="83">Real merchant cart URL; physical order</text>
+    <text class="cardBody" x="18" y="104">not claimed with sandbox-only card.</text>
   </g>
   <path class="connector" d="M600 752H632M890 752H922M1180 752H1212"/>
   <circle class="step" cx="616" cy="752" r="13"/><text class="stepText" x="616" y="756" text-anchor="middle">5</text>
@@ -218,11 +218,11 @@
     <text class="cardBody" x="18" y="104">request IDs, and integrity hashes.</text>
   </g>
   <g transform="translate(1220 907)">
-    <rect class="card planned" width="250" height="132" rx="16"/>
-    <text class="eyebrow mono" x="18" y="27" fill="#91aaff">PRODUCTION PATH</text>
-    <text class="cardTitle" x="18" y="57">Orchestration extension</text>
-    <text class="cardBody" x="18" y="83">API Gateway · IoT Core · Step</text>
-    <text class="cardBody" x="18" y="104">Functions · Bedrock · S3.</text>
+    <rect class="card implemented" width="250" height="132" rx="16"/>
+    <text class="eyebrow mono" x="18" y="27" fill="#36efa3">HOSTED WEB</text>
+    <text class="cardTitle" x="18" y="57">Live evidence console</text>
+    <text class="cardBody" x="18" y="83">Polls sanitized execution state;</text>
+    <text class="cardBody" x="18" y="104">links source, chain and AWS proof.</text>
   </g>
   <path class="connector" d="M600 973H632M890 973H922"/>
   <circle class="step" cx="616" cy="973" r="13"/><text class="stepText" x="616" y="977" text-anchor="middle">8</text>
@@ -232,7 +232,7 @@
 
   <g transform="translate(57 1085)">
     <circle cx="8" cy="-4" r="5" fill="#15e890"/>
-    <text x="22" y="0" fill="#789084" font-size="12">Truthful scope: interface + engine + bounded approval + x402/Fuji settlement + AWS audit are implemented or executed as labelled.</text>
-    <text x="1020" y="0" fill="#789084" font-size="12">No mainnet payment or real merchant purchase is claimed.</text>
+    <text x="22" y="0" fill="#789084" font-size="12">Truthful scope: native messaging + discovery + bounded approval + x402/Fuji + AWS audit are implemented or executed.</text>
+    <text x="1020" y="0" fill="#789084" font-size="12">No mainnet payment or physical purchase is claimed.</text>
   </g>
 </svg>

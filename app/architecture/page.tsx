@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-/* eslint-disable @next/next/no-html-link-for-pages -- plain anchors avoid a vinext production prefetch crash */
 import "./architecture.css";
 
 export const metadata: Metadata = {
@@ -9,9 +8,9 @@ export const metadata: Metadata = {
   twitter: { images: [] },
 };
 
-const SNOWTRACE = "https://testnet.snowtrace.io/tx/0x920f3ee1e61ec5cfac585a86aaf1261dbcc7bab1ec1587e449bac86fd2031335";
+const SNOWTRACE = "https://testnet.snowtrace.io/tx/0xe27f11579a800f96d02438cdc2cd823c4dd780d6b6d16b6c56a8cbe82f586914";
 
-type Status = "live" | "executed" | "sandbox" | "simulated";
+type Status = "live" | "executed" | "sandbox";
 
 function Node({ status, eyebrow, title, children }: {
   status: Status;
@@ -21,7 +20,7 @@ function Node({ status, eyebrow, title, children }: {
 }) {
   return (
     <article className={`architecture-node ${status}`}>
-      <div className="node-top"><span>{eyebrow}</span><em>{status === "simulated" ? "SIMULATED UI" : status.toUpperCase()}</em></div>
+      <div className="node-top"><span>{eyebrow}</span><em>{status.toUpperCase()}</em></div>
       <h3>{title}</h3>
       <p>{children}</p>
     </article>
@@ -32,24 +31,25 @@ export default function Architecture() {
   return (
     <main className="architecture-page">
       <header className="architecture-hero">
-        <nav><a href="/">← Interactive demo</a><a href={SNOWTRACE} target="_blank" rel="noreferrer">Snowtrace proof ↗</a></nav>
+        <nav><a href="/live">← Live evidence console</a><a href={SNOWTRACE} target="_blank" rel="noreferrer">Latest Snowtrace proof ↗</a></nav>
         <div className="architecture-kicker"><span /> IMPLEMENTED ARCHITECTURE</div>
         <h1>One simple message.<br /><em>Four inspectable boundaries.</em></h1>
         <p>DONE turns an outcome into a ranked product, a single-use authority, a machine payment, and a replay-safe execution record. The labels below state exactly what ran and what remains a sandbox.</p>
         <div className="legend" aria-label="Architecture status legend">
-          <span className="live">LIVE</span><span className="executed">EXECUTED</span><span className="sandbox">SANDBOX</span><span className="simulated">SIMULATED UI</span>
+          <span className="live">LIVE</span><span className="executed">EXECUTED</span><span className="sandbox">SANDBOX</span>
         </div>
       </header>
 
       <section className="architecture-grid" aria-label="DONE system architecture">
         <div className="boundary experience-boundary">
           <div className="boundary-heading"><span>01</span><div><b>Customer experience</b><small>One request. One approval.</small></div></div>
-          <Node status="simulated" eyebrow="Interface" title="iMessage experience">The public site reproduces the intended Messages flow without exposing a private Apple account.</Node>
-          <Node status="live" eyebrow="Outcome" title="Request parser">Resolves quantity, no-added-sugar constraint, saved delivery scope, and maximum spend.</Node>
+          <Node status="live" eyebrow="Interface" title="Native iMessage agent">Watches one private Messages conversation on this Mac and replies through the Messages app. The judge console exposes execution evidence, not Apple credentials.</Node>
+          <Node status="live" eyebrow="Outcome" title="OpenAI request parser">Resolves the item, quantity, constraints, delivery scope, and the customer’s exact maximum spend. It never substitutes a fixed demo budget.</Node>
         </div>
 
         <div className="boundary decision-boundary">
           <div className="boundary-heading"><span>02</span><div><b>Decision and authority</b><small>Deterministic before autonomous.</small></div></div>
+          <Node status="live" eyebrow="Discovery" title="Shopify catalogue fetch">Fetches the live merchant catalogue after YES, records HTTP status, time, product count, and a SHA-256 response fingerprint.</Node>
           <Node status="live" eyebrow="Selection" title="BEST policy engine">Rejects hard-constraint failures, ranks delivered value, and publishes every reason.</Node>
           <Node status="live" eyebrow="Guardrail" title="Single-use mandate">Binds amount, merchant, delivery scope, expiry, and idempotency key before execution.</Node>
           <Node status="executed" eyebrow="Signer" title="Local wallet boundary">Signed the Fuji authorization locally. The private key never reached the UI, model, or AWS.</Node>
@@ -58,8 +58,8 @@ export default function Architecture() {
         <div className="boundary payment-boundary">
           <div className="boundary-heading"><span>03</span><div><b>Payment and commerce</b><small>Machine-readable value transfer.</small></div></div>
           <Node status="executed" eyebrow="Protocol" title="StraitsX x402">Returned an exact HTTP 402 request and accepted an EIP-3009 payment authorization.</Node>
-          <Node status="executed" eyebrow="Settlement" title="Avalanche Fuji">Settled 10 test XSGD on C-Chain and verified the emitted transfer event.</Node>
-          <Node status="sandbox" eyebrow="Capability" title="Card + merchant checkout">Returns a non-spendable card reference and a clearly labelled sandbox coffee order.</Node>
+          <Node status="executed" eyebrow="Settlement" title="Avalanche Fuji">Settles the selected product’s exact test-XSGD total on C-Chain and verifies the emitted transfer event.</Node>
+          <Node status="sandbox" eyebrow="Capability" title="Card + merchant checkout">Returns the sponsor sandbox capability and prepares a real Shopify cart handoff. A physical retail order is never claimed without a production card rail.</Node>
         </div>
 
         <div className="boundary aws-boundary">
@@ -71,12 +71,12 @@ export default function Architecture() {
       </section>
 
       <section className="execution-proof">
-        <div className="proof-copy"><span>THE EXECUTED PATH</span><h2>Ask → approve → pay → validate → prove</h2><p>A real sponsor-sandbox x402 payment was settled, then the sanitized evidence was submitted twice to AWS. The first invocation stored it; the second was safely recognized as a replay.</p></div>
+        <div className="proof-copy"><span>THE EXECUTED PATH</span><h2>Ask → approve → discover → pay → validate → prove</h2><p>After explicit approval, DONE fetches and fingerprints the live merchant response, applies the public selection policy, settles the exact sponsor-sandbox x402 amount, and sends sanitized evidence to AWS for validation and replay-safe storage.</p></div>
         <div className="proof-path" aria-label="Executed proof sequence">
-          <div><i>1</i><b>HTTP 402</b><span>Exact 10 XSGD request</span></div><em>→</em>
-          <div><i>2</i><b>Fuji</b><span>On-chain settlement</span></div><em>→</em>
-          <div><i>3</i><b>Lambda</b><span>Evidence validated</span></div><em>→</em>
-          <div><i>4</i><b>DynamoDB</b><span>Replay blocked</span></div>
+          <div><i>1</i><b>Shopify</b><span>Live candidates + source hash</span></div><em>→</em>
+          <div><i>2</i><b>HTTP 402 + Fuji</b><span>Exact selected total settled</span></div><em>→</em>
+          <div><i>3</i><b>Lambda</b><span>Mandate + evidence validated</span></div><em>→</em>
+          <div><i>4</i><b>DynamoDB</b><span>Immutable audit stored</span></div>
         </div>
       </section>
 
@@ -85,7 +85,7 @@ export default function Architecture() {
         <ul><li>Wallet private key</li><li>Card PAN or CVV</li><li>OTP or Apple credentials</li><li>Full delivery address</li></ul>
       </section>
 
-      <footer><a href="/">Run the demo <span>→</span></a><p>DONE · Don’t buy products. Buy outcomes.</p></footer>
+      <footer><a href="/live">Open live console <span>→</span></a><p>DONE · Don’t buy products. Buy outcomes.</p></footer>
     </main>
   );
 }

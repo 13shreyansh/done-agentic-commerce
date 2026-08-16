@@ -1,7 +1,7 @@
 {
   "version": "done-x402-proof-v1",
-  "proofId": "done-920f3ee1e61e",
-  "issuedAt": "2026-08-16T02:32:54.493Z",
+  "proofId": "done-e27f11579a80",
+  "issuedAt": "2026-08-16T05:02:33.447Z",
   "environment": "sponsor-sandbox",
   "capability": "StraitsX sandbox card issuance",
   "http": {
@@ -13,8 +13,8 @@
   },
   "authorization": {
     "transferMethod": "eip3009",
-    "expiresAt": "2026-08-16T02:37:29.000Z",
-    "nonceHash": "f23b20861d69086e301484f93baccba53a0bb6ad0eb40771848273ead855a087"
+    "expiresAt": "2026-08-16T05:07:05.000Z",
+    "nonceHash": "26cc970b34dd19ac49b00f4adfb9cbf89b9af0bd7c07815ccf122e4c9e0d768a"
   },
   "payment": {
     "amountSgd": 10,
@@ -28,16 +28,16 @@
     "network": "Avalanche Fuji C-Chain",
     "chainId": 43113,
     "status": "confirmed",
-    "transactionHash": "0x920f3ee1e61ec5cfac585a86aaf1261dbcc7bab1ec1587e449bac86fd2031335",
-    "blockNumber": 57785026,
+    "transactionHash": "0xe27f11579a800f96d02438cdc2cd823c4dd780d6b6d16b6c56a8cbe82f586914",
+    "blockNumber": 57786332,
     "transferEventVerified": true,
-    "explorerUrl": "https://testnet.snowtrace.io/tx/0x920f3ee1e61ec5cfac585a86aaf1261dbcc7bab1ec1587e449bac86fd2031335"
+    "explorerUrl": "https://testnet.snowtrace.io/tx/0xe27f11579a800f96d02438cdc2cd823c4dd780d6b6d16b6c56a8cbe82f586914"
   },
   "card": {
     "environment": "sandbox",
     "issued": true,
     "canSpendRealMoney": false,
-    "opaqueIdHash": "f9fbe39561f51ebacbe0cd8232bb6e94f539fd53cccf485883e357a460df4619"
+    "opaqueIdHash": "42e3d51dbc89d5387fdf6cb7d810028d40586ba6abe4d717d9dc35b4d64d02a3"
   },
   "mainnet": {
     "xsgdBalance": "30",

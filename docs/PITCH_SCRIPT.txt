@@ -1,13 +1,15 @@
-Buying everyday products still makes people search, compare, approve payments, and trust black-box agents. DONE changes that.
+Buying one everyday item still means searching, comparing, checking constraints, paying, and trusting a black box. DONE turns that process into one bounded message.
 
-Ask for an outcome in one message: find twenty no-added-sugar coffee sachets, deliver them to my saved SMU address, and keep the total under twelve dollars.
+I ask: find twenty no-added-sugar kopi sachets, deliver them to my saved SMU address, and keep the total under ten dollars.
 
-DONE filters hard constraints, ranks eligible products with a public policy, and asks once for a single-use spending mandate. After approval, it completes the workflow and returns a receipt with inspectable proof.
+DONE understands the request, then asks once for permission to spend up to my exact ceiling. It does nothing until I reply YES.
 
-Under the surface, StraitsX x402 issued an exact machine-readable payment request. DONE signed locally and settled ten test XSGD on Avalanche Fuji, with the transaction publicly verifiable.
+Now watch the live evidence console. DONE fetches the real Shopify catalogue, fingerprints the response, rejects anything that breaks my requirements, and explains why the winner is best.
 
-AWS Lambda validates the execution evidence. DynamoDB prevents duplicate orders. CloudWatch provides traceability.
+It pays the selected total through StraitsX x402. The authorization is signed locally and the test-XSGD transfer is confirmed on Avalanche Fuji.
 
-The merchant checkout and iMessage interface are clearly labelled sandboxes, while the payment and AWS proofs are live.
+AWS Lambda validates the evidence. DynamoDB stores it idempotently. CloudWatch and X-Ray make the execution inspectable.
+
+Finally, iMessage returns the selected product, real cart, Snowtrace proof, and AWS request ID. The sponsor card is sandbox-only, so we prepare the cart without falsely claiming a physical purchase.
 
 DONE. Don’t buy products. Buy outcomes.

@@ -2,27 +2,28 @@
 
 ## Judge links
 
-- Product: https://kopi-agent-demo.shreyanshagarwal134.chatgpt.site
-- Architecture: https://kopi-agent-demo.shreyanshagarwal134.chatgpt.site/architecture
-- One-minute pitch: https://kopi-agent-demo.shreyanshagarwal134.chatgpt.site/done-one-minute-pitch.mp4
+- Product: https://done-agentic-commerce.vercel.app/
+- Live evidence console: https://done-agentic-commerce.vercel.app/live
+- Architecture: https://done-agentic-commerce.vercel.app/architecture
 - Source: https://github.com/13shreyansh/done-agentic-commerce
-- On-chain proof: https://testnet.snowtrace.io/tx/0x920f3ee1e61ec5cfac585a86aaf1261dbcc7bab1ec1587e449bac86fd2031335
+- Latest on-chain proof: https://testnet.snowtrace.io/tx/0xe27f11579a800f96d02438cdc2cd823c4dd780d6b6d16b6c56a8cbe82f586914
 
 ## What the judge should see
 
-1. A customer requests an outcome in ordinary language.
-2. DONE applies hard constraints and the public BEST policy.
-3. The customer approves one exact spending ceiling.
-4. DONE completes the sandbox merchant order once and returns an inspectable receipt.
-5. The proof sheet exposes the live x402, Avalanche, and AWS evidence behind the simple conversation.
+1. A real iMessage asks for an outcome and supplies a maximum SGD total.
+2. OpenAI interprets the request, then DONE asks once for explicit permission using that exact ceiling.
+3. After `YES`, the live console shows the Shopify endpoint, fetch time, HTTP status, response hash, evaluated candidates, and BEST-policy winner.
+4. DONE settles the selected total as Fuji test XSGD through StraitsX x402.
+5. AWS Lambda validates the execution; DynamoDB stores it idempotently; CloudWatch/X-Ray expose the audit trail.
+6. Messages returns the real cart, Snowtrace proof, and AWS request ID.
 
 ## Award fit
 
-- AI Commerce Agents: natural-language intent becomes a resolved SKU and completed outcome.
-- StraitsX Real-World Impact: Singapore-dollar-native, auditable everyday commerce with bounded authority.
-- Avalanche x402: an executed HTTP 402 + EIP-3009 flow settled 10 test XSGD on Fuji.
-- AWS Best Architected: Lambda validation, conditional DynamoDB idempotency, encrypted recoverable state, least-privilege IAM, CloudWatch logs, and active tracing.
+- **AI Commerce Agents:** natural-language intent becomes live product evidence, a resolved SKU, bounded approval, payment, and receipt.
+- **StraitsX Real-World Impact:** SGD-native everyday commerce with explicit authority and public payment evidence.
+- **Avalanche x402:** executed HTTP 402 + EIP-3009 settlement in test XSGD on Fuji.
+- **AWS Best Architected:** validation, conditional idempotency, encryption, PITR, TTL, least-privilege IAM, retained logs, and active tracing.
 
 ## Truthful boundary
 
-The x402 sponsor-sandbox payment and Avalanche Fuji settlement were executed. The AWS stack is deployed and its replay test was executed. The merchant checkout, card capability, and public iMessage interface are clearly labelled sandboxes. No real merchant order or mainnet payment is claimed.
+The native iMessage transport, live Shopify discovery, x402 sponsor-sandbox payment, Avalanche Fuji settlement, and AWS audit path are implemented. The hosted home page is a presentation walkthrough; `/live` is the execution-evidence console. The real Shopify cart is prepared, but no physical retail purchase or mainnet payment is claimed because the sponsor-issued card is sandbox-only.

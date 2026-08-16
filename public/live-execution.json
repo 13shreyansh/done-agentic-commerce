@@ -1,0 +1,22 @@
+{
+  "version": "done-live-run-v1",
+  "runId": "waiting-1786858181365",
+  "stage": "listening",
+  "truthfulMode": "LIVE DISCOVERY · FUJI TESTNET · REAL AWS · MERCHANT CART HANDOFF",
+  "request": null,
+  "approval": null,
+  "discovery": null,
+  "payment": null,
+  "aws": null,
+  "receipt": null,
+  "events": [
+    {
+      "at": "2026-08-16T05:29:41.365Z",
+      "stage": "listening",
+      "title": "iMessage agent connected",
+      "detail": "Waiting for a new customer outcome",
+      "kind": "complete"
+    }
+  ],
+  "updatedAt": "2026-08-16T05:29:41.365Z"
+}

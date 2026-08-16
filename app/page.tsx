@@ -6,10 +6,21 @@ import type { OrderResult, PurchaseCommand } from "@/lib/commerce/types";
 import { isPaymentProof, type PaymentProof } from "@/lib/payments/types";
 
 const REQUEST =
-  "Find me 20 sachets of no-added-sugar kopi. Deliver them to my saved SMU address. Keep the total under S$12.";
+  "Find me 20 sachets of no-added-sugar kopi. Deliver them to my saved SMU address. Keep the total under S$10.";
 
-const PERMISSION = "Do I have your permission to spend up to S$12 from your XSGD wallet?";
 const APPROVAL = "Yes";
+
+function requestBudget(value: string) {
+  const match = value.match(/(?:keep(?:\s+the)?\s+total\s+under|total\s+under|spend\s+up\s+to|up\s+to|under|max(?:imum)?(?:\s+of)?)\s*(?:s\$|sgd|\$)?\s*(\d+(?:\.\d{1,2})?)/i);
+  const parsed = match ? Number(match[1]) : Number.NaN;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function requestQuantity(value: string) {
+  const match = value.match(/\b(\d+)\s*(?:sachets?|sticks?|packets?|pieces?|pcs?)\b/i);
+  const parsed = match ? Number(match[1]) : Number.NaN;
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
+}
 
 type Stage = "compose" | "asking" | "permission" | "ordering" | "ordered";
 
@@ -52,12 +63,14 @@ function TypingBubble() {
   );
 }
 
-function PermissionBubble() {
+function PermissionBubble({ maxSpendSgd }: { maxSpendSgd: number | null }) {
   return (
     <div className="row incoming-row permission-row">
       <div className="bubble incoming permission-bubble">
         <b>I can do that.</b>
-        {PERMISSION}
+        {maxSpendSgd == null
+          ? "What is the maximum total in SGD that I may spend?"
+          : `Do I have your permission to spend up to ${formatSgd(maxSpendSgd)} from your XSGD wallet?`}
       </div>
     </div>
   );
@@ -297,6 +310,7 @@ export default function Home() {
   const [stage, setStage] = useState<Stage>("compose");
   const [draft, setDraft] = useState("");
   const [requestText, setRequestText] = useState("");
+  const [maxSpendSgd, setMaxSpendSgd] = useState<number | null>(null);
   const [answerText, setAnswerText] = useState("");
   const [autoplay, setAutoplay] = useState(false);
   const [introVisible, setIntroVisible] = useState(true);
@@ -352,6 +366,7 @@ export default function Home() {
     setStage("compose");
     setDraft("");
     setRequestText("");
+    setMaxSpendSgd(null);
     setAnswerText("");
     setAutoplay(false);
     setProofOpen(false);
@@ -367,6 +382,7 @@ export default function Home() {
     runRef.current += 1;
     idempotencyKeyRef.current = `done-${window.crypto.randomUUID()}`;
     setRequestText(text);
+    setMaxSpendSgd(requestBudget(text));
     setDraft("");
     setApprovalError("");
     setOrderError("");
@@ -374,9 +390,13 @@ export default function Home() {
     later(() => setStage("permission"), 700);
   }, [later]);
 
-  const beginOrder = useCallback(async (text = APPROVAL, rawRequest = REQUEST) => {
+  const beginOrder = useCallback(async (text = APPROVAL, rawRequest = REQUEST, approvedBudget = requestBudget(rawRequest)) => {
+    if (approvedBudget == null) {
+      setApprovalError("Set a maximum spend first. Nothing was spent.");
+      return;
+    }
     if (!/\b(yes|approve|approved|proceed|go ahead)\b/i.test(text)) {
-      setApprovalError("Please reply Yes to approve the S$12 ceiling, or restart to cancel.");
+      setApprovalError(`Please reply Yes to approve the ${formatSgd(approvedBudget)} ceiling, or restart to cancel.`);
       return;
     }
 
@@ -386,16 +406,16 @@ export default function Home() {
     const command: PurchaseCommand = {
       intent: {
         rawRequest,
-        quantity: 20,
-        noAddedSugar: true,
+        quantity: requestQuantity(rawRequest),
+        noAddedSugar: /(?:no\s*(?:added\s*)?sugar|sugar[ -]?free|kosong)/i.test(rawRequest),
         deliveryAddressLabel: "SMU · Saved address",
         deliveryRegion: "SG",
-        maxTotalSgd: 12,
+        maxTotalSgd: approvedBudget,
       },
       approval: {
         approved: true,
         approvalText: text,
-        maxSpendSgd: 12,
+        maxSpendSgd: approvedBudget,
       },
       idempotencyKey,
     };
@@ -452,8 +472,19 @@ export default function Home() {
     const text = draft.trim();
     if (!text) return;
     if (stage === "compose") beginRequest(text);
-    if (stage === "permission") void beginOrder(text, requestText || REQUEST);
-  }, [beginOrder, beginRequest, draft, requestText, stage]);
+    if (stage === "permission" && maxSpendSgd == null) {
+      const suppliedBudget = requestBudget(`up to ${text}`);
+      if (suppliedBudget == null) {
+        setApprovalError("Enter a maximum total such as S$10. Nothing was spent.");
+        return;
+      }
+      setMaxSpendSgd(suppliedBudget);
+      setDraft("");
+      setApprovalError("");
+      return;
+    }
+    if (stage === "permission") void beginOrder(text, requestText || REQUEST, maxSpendSgd);
+  }, [beginOrder, beginRequest, draft, maxSpendSgd, requestText, stage]);
 
   const play = useCallback(() => {
     reset();
@@ -465,7 +496,7 @@ export default function Home() {
       setStage("asking");
     }, 500);
     later(() => setStage("permission"), 1250);
-    later(() => void beginOrder(APPROVAL, REQUEST), 2600);
+    later(() => void beginOrder(APPROVAL, REQUEST, requestBudget(REQUEST)), 2600);
   }, [beginOrder, later, reset]);
 
   const startSimulation = useCallback(() => {
@@ -530,8 +561,8 @@ export default function Home() {
           <div className="simulation-intro-card">
             <div className="simulation-kicker"><span /> BEFORE THE DEMO</div>
             <h2 id="simulation-title">You’re about to watch a simulated experience.</h2>
-            <p>The real experience begins after the customer connects <b>iMessage</b> and a <b>user-controlled wallet</b>. Those private connections cannot be exposed in a public judge demo.</p>
-            <p>What follows shows exactly how it will feel: ask for an outcome, approve one spending limit, receive the order, and inspect the payment proof.</p>
+            <p>The native experience runs through <b>iMessage</b> and a <b>user-controlled wallet</b> on the operator&apos;s Mac. Those private connections are implemented, but cannot be exposed to a public Vercel page.</p>
+            <p>What follows is the replayable presentation. Open the live evidence console during the native run to inspect merchant discovery, payment, and AWS receipts.</p>
             <button onClick={startSimulation}>Watch the simulation <span>→</span></button>
             <div className="intro-progress" aria-hidden="true"><i /></div>
             <small>Starting automatically in a few seconds</small>
@@ -541,8 +572,8 @@ export default function Home() {
       <section className="presentation-copy">
         <div className="eyebrow"><span /> LIVE DEMO · IMESSAGE SIMULATION</div>
         <h1>Ask.<br />Approve.<br /><em>Done.</em></h1>
-        <p>This public demo simulates the experience of DONE connected to Apple Messages and a user-controlled wallet. It asks once for a spending ceiling, completes the outcome, and exposes the order and payment proof.</p>
-        <div className="simulation-note"><b>Simulation boundary</b> The conversation is rendered here for judges. In the real-world design, Messages is the interface and the wallet signs locally—private keys never enter this website or the model.</div>
+        <p>This public page replays the DONE experience safely. The native Mac agent uses real Apple Messages, live Shopify discovery, local wallet signing, Avalanche Fuji, and AWS; `/live` exposes only its sanitized evidence.</p>
+        <div className="simulation-note"><b>Presentation boundary</b> The conversation here is rendered for judges. In the native runtime, Messages is the interface and the wallet signs locally—private keys never enter this website or the model.</div>
         <div className="demo-actions">
           <button className="play-demo" onClick={play}><span>▶</span> Replay iMessage loop</button>
           <button className="restart-demo" onClick={reset}>Restart</button>
@@ -577,7 +608,7 @@ export default function Home() {
                 <div className="row outgoing-row request-row"><div className="bubble outgoing">{requestText || REQUEST}</div></div>
               )}
               {stage === "asking" && <TypingBubble />}
-              {(stage === "permission" || stage === "ordering" || stage === "ordered") && <PermissionBubble />}
+              {(stage === "permission" || stage === "ordering" || stage === "ordered") && <PermissionBubble maxSpendSgd={maxSpendSgd} />}
               {(approvalError || orderError) && <div className="engine-error">{approvalError || orderError}</div>}
               {(stage === "ordering" || stage === "ordered") && (
                 <div className="row outgoing-row yes-row"><div className="bubble outgoing">{answerText || APPROVAL}</div><div className="delivered">Delivered</div></div>
@@ -596,7 +627,7 @@ export default function Home() {
               onChange={setDraft}
               onSend={send}
               disabled={composerDisabled}
-              placeholder={stage === "permission" ? "Reply Yes to approve" : "iMessage"}
+              placeholder={stage === "permission" ? (maxSpendSgd == null ? "Maximum total (for example S$10)" : "Reply Yes to approve") : "iMessage"}
             />
             <div className="home-indicator" />
           </div>

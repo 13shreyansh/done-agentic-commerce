@@ -30,6 +30,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!/native-agent/.env.example
 
 # vercel
 .vercel
@@ -39,3 +40,8 @@ yarn-error.log*
 /outputs/
 /work/
 /.playwright-cli/
+
+# Native Mac agent runtime state (source is committed; secrets are not)
+/native-agent/node_modules/
+/native-agent/.secrets/
+/native-agent/.env

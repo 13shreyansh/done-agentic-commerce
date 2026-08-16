@@ -1,0 +1,33 @@
+{
+  "name": "done-native-agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "DONE native Mac iMessage, live Shopify discovery, StraitsX x402, Avalanche, and AWS execution agent.",
+  "bin": {
+    "agentix": "./bin/agentix.mjs"
+  },
+  "scripts": {
+    "status": "node ./bin/agentix.mjs status",
+    "mcp": "node ./bin/agentix.mjs mcp tools",
+    "x402": "node ./bin/agentix.mjs x402 issue-sandbox-card",
+    "aws": "node ./bin/agentix.mjs aws status",
+    "aws:phase4": "node ./infra/aws/deploy.mjs",
+    "audit": "node ./bin/agentix.mjs audit",
+    "demo": "node ./bin/agentix.mjs demo",
+    "live": "node ./bin/done-live-agent.mjs",
+    "check": "node --check ./bin/agentix.mjs && node --check ./bin/done-live-agent.mjs && node --check ./lib/done-ai.mjs && node --check ./lib/straitsx-sandbox.mjs && node --check ./lib/shopify-discovery.mjs && node --check ./lib/live-execution.mjs && node --check ./lib/aws-audit.mjs"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^4.0.42",
+    "@inquirer/prompts": "^7.8.4",
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "ai": "^7.0.66",
+    "commander": "^14.0.0",
+    "ethers": "^6.15.0",
+    "zod": "^4.4.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

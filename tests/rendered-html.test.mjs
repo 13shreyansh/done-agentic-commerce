@@ -38,7 +38,8 @@ test("server-renders the truthful judge architecture", async () => {
   assert.match(html, /AWS Lambda/);
   assert.match(html, /Amazon DynamoDB/);
   assert.match(html, /StraitsX x402/);
-  assert.match(html, /SIMULATED UI/);
+  assert.match(html, /Native iMessage agent/i);
+  assert.match(html, /Shopify catalogue fetch/i);
   assert.match(html, /SANDBOX/);
   assert.match(html, /What never leaves the user/);
 });
