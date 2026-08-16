@@ -1,0 +1,13 @@
+Buying everyday products still makes people search, compare, approve payments, and trust black-box agents. DONE changes that.
+
+Ask for an outcome in one message: find twenty no-added-sugar coffee sachets, deliver them to my saved SMU address, and keep the total under twelve dollars.
+
+DONE filters hard constraints, ranks eligible products with a public policy, and asks once for a single-use spending mandate. After approval, it completes the workflow and returns a receipt with inspectable proof.
+
+Under the surface, StraitsX x402 issued an exact machine-readable payment request. DONE signed locally and settled ten test XSGD on Avalanche Fuji, with the transaction publicly verifiable.
+
+AWS Lambda validates the execution evidence. DynamoDB prevents duplicate orders. CloudWatch provides traceability.
+
+The merchant checkout and iMessage interface are clearly labelled sandboxes, while the payment and AWS proofs are live.
+
+DONE. Don’t buy products. Buy outcomes.

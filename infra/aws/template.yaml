@@ -1,0 +1,233 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: DONE Phase 4 validated execution and idempotent audit boundary
+
+Parameters:
+  AuditTableName:
+    Type: String
+    Default: done-order-audit
+  AuditFunctionName:
+    Type: String
+    Default: done-order-audit
+  AuditRoleName:
+    Type: String
+    Default: done-order-audit-lambda
+
+Resources:
+  AuditTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref AuditTableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+      SSESpecification:
+        SSEEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+      Tags:
+        - Key: Project
+          Value: DONE
+        - Key: Phase
+          Value: "4"
+
+  AuditLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AuditFunctionName}
+      RetentionInDays: 7
+      Tags:
+        - Key: Project
+          Value: DONE
+        - Key: Phase
+          Value: "4"
+
+  AuditExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref AuditRoleName
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: done-order-audit-runtime
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: AuditRecordOnly
+                Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                Resource: !GetAtt AuditTable.Arn
+              - Sid: FunctionLogStreamOnly
+                Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub ${AuditLogGroup.Arn}:*
+              - Sid: ActiveTracing
+                Effect: Allow
+                Action:
+                  - xray:PutTelemetryRecords
+                  - xray:PutTraceSegments
+                Resource: "*"
+      Tags:
+        - Key: Project
+          Value: DONE
+        - Key: Phase
+          Value: "4"
+
+  AuditFunction:
+    Type: AWS::Lambda::Function
+    DependsOn:
+      - AuditLogGroup
+      - AuditExecutionRole
+    Properties:
+      FunctionName: !Ref AuditFunctionName
+      Description: Validates DONE purchase evidence and writes one immutable audit record per mandate
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      Handler: index.handler
+      MemorySize: 256
+      Timeout: 10
+      Role: !GetAtt AuditExecutionRole.Arn
+      TracingConfig:
+        Mode: Active
+      Environment:
+        Variables:
+          AUDIT_TABLE_NAME: !Ref AuditTable
+          EXPECTED_CHAIN_ID: "43113"
+      Code:
+        ZipFile: |
+          const crypto = require("node:crypto");
+          const {
+            DynamoDBClient,
+            GetItemCommand,
+            PutItemCommand,
+          } = require("@aws-sdk/client-dynamodb");
+
+          const db = new DynamoDBClient({});
+          const tableName = process.env.AUDIT_TABLE_NAME;
+          const expectedChainId = Number(process.env.EXPECTED_CHAIN_ID || "43113");
+
+          function stable(value) {
+            if (Array.isArray(value)) return `[${value.map(stable).join(",")}]`;
+            if (value && typeof value === "object") {
+              return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stable(value[key])}`).join(",")}}`;
+            }
+            return JSON.stringify(value);
+          }
+
+          function sha256(value) {
+            return crypto.createHash("sha256").update(value).digest("hex");
+          }
+
+          function assert(condition, message) {
+            if (!condition) throw new Error(`InvalidAuditRequest: ${message}`);
+          }
+
+          function validate(event) {
+            assert(event && typeof event === "object", "event is required");
+            assert(event.version === "done-order-audit-request-v1", "unsupported version");
+            assert(/^DONE-[A-Z0-9-]{8,80}$/.test(event.orderId || ""), "invalid order ID");
+            assert(/^done-[a-z0-9-]{12,160}$/.test(event.idempotencyKey || ""), "invalid idempotency key");
+            assert(typeof event.outcome === "string" && event.outcome.length >= 8 && event.outcome.length <= 180, "invalid outcome");
+            assert(Number.isFinite(event.maxSpendSgd) && event.maxSpendSgd > 0 && event.maxSpendSgd <= 12, "invalid spending ceiling");
+            assert(Number.isFinite(event.totalSgd) && event.totalSgd > 0 && event.totalSgd <= event.maxSpendSgd, "total exceeds mandate");
+            assert(event.merchant === "Shun Dat", "unexpected merchant");
+            assert(event.merchantEnvironment === "merchant-sandbox", "merchant environment must be sandbox");
+            assert(event.delivery === "SMU · Saved address", "unexpected delivery scope");
+            assert(event.payment && typeof event.payment === "object", "payment proof is required");
+            assert(event.payment.environment === "sponsor-sandbox", "payment environment must be sponsor sandbox");
+            assert(event.payment.chainId === expectedChainId, "unexpected settlement chain");
+            assert(event.payment.token === "test XSGD", "unexpected payment token");
+            assert(event.payment.amountSgd === event.totalSgd, "payment and order totals differ");
+            assert(/^0x[0-9a-fA-F]{64}$/.test(event.payment.transactionHash || ""), "invalid transaction hash");
+            assert(/^done-[0-9a-f]{12}$/.test(event.payment.proofId || ""), "invalid payment proof ID");
+          }
+
+          exports.handler = async (event, context) => {
+            console.log(JSON.stringify({ event: "audit.received", requestId: context.awsRequestId, orderId: event?.orderId }));
+            validate(event);
+
+            const canonicalPayload = stable(event);
+            const payloadSha256 = sha256(canonicalPayload);
+            const pk = `ORDER#${event.idempotencyKey}`;
+            const recordKeyHash = sha256(pk);
+            const now = new Date().toISOString();
+            const expiresAt = String(Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60);
+
+            try {
+              await db.send(new PutItemCommand({
+                TableName: tableName,
+                ConditionExpression: "attribute_not_exists(pk)",
+                Item: {
+                  pk: { S: pk },
+                  orderId: { S: event.orderId },
+                  payloadSha256: { S: payloadSha256 },
+                  status: { S: "validated" },
+                  environment: { S: "aws-event-account" },
+                  sourceTransactionHash: { S: event.payment.transactionHash },
+                  canonicalPayload: { S: canonicalPayload },
+                  createdAt: { S: now },
+                  expiresAt: { N: expiresAt },
+                },
+              }));
+              console.log(JSON.stringify({ event: "audit.stored", requestId: context.awsRequestId, orderId: event.orderId, payloadSha256 }));
+              return {
+                version: "done-order-audit-result-v1",
+                outcome: "stored",
+                orderId: event.orderId,
+                payloadSha256,
+                recordKeyHash,
+                requestId: context.awsRequestId,
+              };
+            } catch (error) {
+              if (error?.name !== "ConditionalCheckFailedException") throw error;
+              const existing = await db.send(new GetItemCommand({
+                TableName: tableName,
+                Key: { pk: { S: pk } },
+                ConsistentRead: true,
+                ProjectionExpression: "orderId, payloadSha256",
+              }));
+              assert(existing.Item?.payloadSha256?.S === payloadSha256, "idempotency key reused for different evidence");
+              console.log(JSON.stringify({ event: "audit.replayed", requestId: context.awsRequestId, orderId: event.orderId, payloadSha256 }));
+              return {
+                version: "done-order-audit-result-v1",
+                outcome: "replayed",
+                orderId: existing.Item.orderId.S,
+                payloadSha256,
+                recordKeyHash,
+                requestId: context.awsRequestId,
+              };
+            }
+          };
+      Tags:
+        - Key: Project
+          Value: DONE
+        - Key: Phase
+          Value: "4"
+
+Outputs:
+  FunctionName:
+    Value: !Ref AuditFunction
+  FunctionArn:
+    Value: !GetAtt AuditFunction.Arn
+  TableName:
+    Value: !Ref AuditTable
+  LogGroupName:
+    Value: !Ref AuditLogGroup
+  RoleArn:
+    Value: !GetAtt AuditExecutionRole.Arn

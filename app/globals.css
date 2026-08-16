@@ -551,6 +551,9 @@ button { -webkit-tap-highlight-color: transparent; }
 .replay-test.confirmed { border-color: rgba(21,232,144,.2); color: #55e6a3; background: rgba(21,232,144,.07); cursor: default; }
 .replay-test.error { color: #f2a993; }
 .proof-footnote { margin: 13px 2px 0; color: #68766f; font-size: 9.5px; line-height: 1.4; }
+.submission-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.submission-links a { padding: 8px 11px; border: 1px solid rgba(255,255,255,.1); border-radius: 999px; color: #aebdb6; background: rgba(255,255,255,.04); text-decoration: none; font: 590 9px/1 var(--font-geist-mono), monospace; transition: color .16s ease, border-color .16s ease, background .16s ease; }
+.submission-links a:hover { border-color: rgba(21,232,144,.3); color: var(--green); background: rgba(21,232,144,.07); }
 
 @media (max-width: 930px) {
   .demo-shell { grid-template-columns: 1fr; overflow: auto; }

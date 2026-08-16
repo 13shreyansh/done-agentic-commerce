@@ -1,11 +1,11 @@
 {
   "version": "done-aws-proof-v1",
-  "proofId": "aws-b413b60b0b48",
-  "verifiedAt": "2026-08-16T02:49:17.450Z",
+  "proofId": "aws-e1a78a9cd070",
+  "verifiedAt": "2026-08-16T02:55:41.769Z",
   "environment": "aws-event-account",
   "region": "ap-southeast-1",
   "stackName": "done-phase4",
-  "stackStatus": "CREATE_COMPLETE",
+  "stackStatus": "UPDATE_COMPLETE",
   "architecture": [
     {
       "service": "AWS Lambda",
@@ -28,13 +28,13 @@
     "runtime": "nodejs22.x",
     "architecture": "arm64",
     "state": "Active",
-    "firstRequestId": "beca85ae-787a-406e-9c78-3564362c928d",
+    "firstRequestId": "c4bac745-7864-4572-8b9a-33eb33983eb6",
     "firstOutcome": "stored",
-    "replayRequestId": "7660505d-0c08-4e1a-bf7e-8efb88982314",
+    "replayRequestId": "0f7bcc1e-2c71-48df-8f37-1053f52ef574",
     "replayOutcome": "replayed",
     "orderId": "DONE-COFFEE-920F3EE1E61E",
-    "idempotencyKeyHash": "65f7400f72c6a5b658f8efcf9ea6d996382ef4cb243aa2e9f5b9622bc9da94e2",
-    "payloadSha256": "b413b60b0b48131171b8619889f0e3c8eb14c2e56ba8cfa23da7c922ba985582"
+    "idempotencyKeyHash": "8841ef18a2eca76009ce5e69a17e612af9b1d72ee28ce9789bf97a2c02f69f68",
+    "payloadSha256": "e1a78a9cd0703b2de5934fa90e9e5c8a9438158141c28c6269582c85c283e286"
   },
   "audit": {
     "tableName": "done-order-audit",

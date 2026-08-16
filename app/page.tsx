@@ -213,7 +213,7 @@ function ProofSheet({ result, paymentProof, awsProof, replayStatus, onReplay, on
     <div className="proof-overlay" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section className="proof-sheet" role="dialog" aria-modal="true" aria-labelledby="proof-title">
         <div className="proof-header">
-          <div><span>PHASE 4 · AWS {awsProof ? "CONNECTED" : "READY"}</span><h2 id="proof-title">Order proof</h2></div>
+          <div><span>LIVE EXECUTION · AWS {awsProof ? "CONNECTED" : "READY"}</span><h2 id="proof-title">Order proof</h2></div>
           <button onClick={onClose} aria-label="Close order proof">×</button>
         </div>
         <p className="proof-intro">The conversation stayed simple. This panel exposes the decision, bounded authority, payment, merchant-sandbox result, and verified AWS execution evidence behind it.</p>
@@ -553,11 +553,16 @@ export default function Home() {
           <span className={flowClass(2)}>Ordered</span>
         </div>
         <div className="checkpoint-card">
-          <span>PHASE 4 CHECKPOINT</span>
-          <div><i>01</i><p><b>Validated Lambda execution</b>The boundary rejects evidence outside the approved order, budget, merchant, and Fuji payment.</p></div>
-          <div><i>02</i><p><b>Idempotent DynamoDB audit</b>A conditional write makes the same mandate safe to retry without duplicate execution.</p></div>
-          <div><i>03</i><p><b>CloudWatch evidence</b>Retained logs and active tracing make the execution inspectable.</p></div>
+          <span>WHY DONE WINS</span>
+          <div><i>01</i><p><b>Commerce agent, not a chatbot</b>It filters, compares, selects, asks for one bounded approval, and returns the completed outcome.</p></div>
+          <div><i>02</i><p><b>Live x402 + XSGD proof</b>Ten test XSGD settled on Avalanche Fuji through an exact HTTP 402 payment request.</p></div>
+          <div><i>03</i><p><b>Real AWS reliability</b>Lambda validates evidence, DynamoDB blocks duplicate execution, and CloudWatch makes it traceable.</p></div>
         </div>
+        <nav className="submission-links" aria-label="Submission resources">
+          <a href="/architecture">Architecture</a>
+          <a href="/done-one-minute-pitch.mp4">One-minute pitch</a>
+          <a href="https://github.com/13shreyansh/done-agentic-commerce" target="_blank" rel="noreferrer">Source ↗</a>
+        </nav>
       </section>
 
       <section className="phone-stage" aria-label="Interactive iPhone Messages simulation">
