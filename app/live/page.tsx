@@ -42,6 +42,24 @@ type LiveState = {
   events: Array<{ at: string; stage: string; title: string; detail: string; kind: string }>;
 };
 
+type MainnetProof = {
+  generatedAt: string;
+  classification: string;
+  network: { name: string; chainId: number };
+  token: { symbol: string; contract: string; decimals: number };
+  transfer: {
+    from: string;
+    to: string;
+    amount: string;
+    transactionHash: string;
+    blockNumber: number;
+    explorerUrl: string;
+    transferEventVerified: boolean;
+  };
+  balances: { senderBefore: string; senderAfter: string; recipientBefore: string; recipientAfter: string };
+  gas: { gasUsed: string; feeAvax: string };
+};
+
 const stageRank: Record<string, number> = {
   listening: 0,
   "approval-required": 1,
@@ -63,6 +81,7 @@ const architecture = [
   { rank: 5, name: "Avalanche Fuji", detail: "Confirmed test XSGD", tone: "executed" },
   { rank: 6, name: "AWS Lambda", detail: "Evidence validation", tone: "live" },
   { rank: 7, name: "DynamoDB + CloudWatch", detail: "Audit + observability", tone: "live" },
+  { rank: 0, name: "Avalanche mainnet", detail: "0.10 real XSGD verified", tone: "executed" },
 ] as const;
 
 function short(value?: string, head = 12, tail = 8) {
@@ -77,6 +96,7 @@ function time(value?: string) {
 
 export default function LiveExecutionPage() {
   const [state, setState] = useState<LiveState | null>(null);
+  const [mainnetProof, setMainnetProof] = useState<MainnetProof | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -94,6 +114,18 @@ export default function LiveExecutionPage() {
     void poll();
     const timer = window.setInterval(() => void poll(), 650);
     return () => { active = false; window.clearInterval(timer); };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    void fetch(`/mainnet-proof.json?t=${Date.now()}`, { cache: "no-store" })
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json() as Promise<MainnetProof>;
+      })
+      .then((proof) => { if (active) setMainnetProof(proof); })
+      .catch(() => { /* The card remains pending until a verified proof is published. */ });
+    return () => { active = false; };
   }, []);
 
   const rank = stageRank[state?.stage || "listening"] || 0;
@@ -173,6 +205,17 @@ export default function LiveExecutionPage() {
               <div><small>AVALANCHE</small>{state?.payment ? <a href={state.payment.settlement.explorerUrl} target="_blank" rel="noreferrer">{short(state.payment.settlement.transactionHash)} ↗</a> : <b>Pending Fuji receipt</b>}<p>{state?.payment?.settlement.network || "Chain ID 43113"}</p></div>
               <div><small>AWS REQUEST</small><b>{short(state?.aws?.requestId)}</b><p>{state?.aws ? `${state.aws.functionName} · ${state.aws.outcome}` : "Lambda validation pending"}</p></div>
               <div><small>MERCHANT HANDOFF</small>{state?.receipt?.cartUrl ? <a href={state.receipt.cartUrl} target="_blank" rel="noreferrer">Open real Shopify cart ↗</a> : <b>Pending</b>}<p>{state?.receipt?.note || "No physical order is claimed without a production payment rail."}</p></div>
+            </div>
+          </section>
+
+          <section className="evidence-card mainnet-proof-card">
+            <div className="card-title"><div><span>04</span><h2>Real Avalanche mainnet proof</h2></div><em className={mainnetProof ? "ok" : ""}>{mainnetProof ? "TRANSFER VERIFIED" : "PENDING"}</em></div>
+            <div className="proof-grid">
+              <div><small>REAL VALUE</small><b>{mainnetProof ? `${mainnetProof.transfer.amount} ${mainnetProof.token.symbol}` : "Waiting for proof"}</b><p>Avalanche mainnet · chain {mainnetProof?.network.chainId || 43114}</p></div>
+              <div><small>ON-CHAIN RECEIPT</small>{mainnetProof ? <a href={mainnetProof.transfer.explorerUrl} target="_blank" rel="noreferrer">{short(mainnetProof.transfer.transactionHash)} ↗</a> : <b>Pending</b>}<p>{mainnetProof ? `Block ${mainnetProof.transfer.blockNumber} · event matched` : "No transaction claimed"}</p></div>
+              <div><small>FROM → TO</small><b>{mainnetProof ? `${short(mainnetProof.transfer.from, 8, 5)} → ${short(mainnetProof.transfer.to, 8, 5)}` : "Pending"}</b><p>Both addresses independently checked on C-Chain</p></div>
+              <div><small>POST-BALANCES</small><b>{mainnetProof ? `${mainnetProof.balances.senderAfter} / ${mainnetProof.balances.recipientAfter} XSGD` : "Pending"}</b><p>{mainnetProof ? `${mainnetProof.gas.feeAvax} AVAX gas` : "No gas spent"}</p></div>
+              <div className="mainnet-disclosure"><small>TRUTHFUL SCOPE</small><b>{mainnetProof?.classification || "A mainnet transfer has not been attached."}</b><p>This proves real XSGD settlement capability. The coffee checkout remains a separately labelled sponsor sandbox and Shopify-cart handoff.</p></div>
             </div>
           </section>
         </div>

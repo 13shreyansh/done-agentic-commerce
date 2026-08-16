@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { chmod, mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { password } from "@inquirer/prompts";
+import { confirm, password } from "@inquirer/prompts";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 import { Command } from "commander";
@@ -14,9 +14,11 @@ import {
   JsonRpcProvider,
   Wallet,
   formatEther,
+  formatUnits,
   getAddress,
   hexlify,
   parseEther,
+  parseUnits,
   randomBytes,
 } from "ethers";
 
@@ -31,10 +33,12 @@ const AWS_START_URL = "https://d-9667af3970.awsapps.com/start";
 const KEYSTORE_DIR = resolve(".secrets");
 const PRIVATE_CARD_RECEIPT = join(KEYSTORE_DIR, "sandbox-card.json");
 const PUBLIC_PAYMENT_PROOF = resolve("../public/phase3-proof.json");
+const PUBLIC_MAINNET_PROOF = resolve("../public/mainnet-proof.json");
 const ERC20_ABI = [
   "function balanceOf(address) view returns (uint256)",
   "function decimals() view returns (uint8)",
   "function symbol() view returns (string)",
+  "function transfer(address recipient, uint256 amount) returns (bool)",
   "event Transfer(address indexed from, address indexed to, uint256 value)",
 ];
 
@@ -536,6 +540,185 @@ async function showKeystoreAddress(nameInput) {
   console.log(wallet.address);
 }
 
+async function sendMainnetXsgd(nameInput, expectedAddressInput, recipientInput, amountInput) {
+  const expectedAddress = getAddress(expectedAddressInput || process.env.AGENTIX_ADDRESS || DEFAULT_ADDRESS);
+  const recipient = getAddress(recipientInput);
+  const tokenAddress = getAddress(MAINNET_XSGD);
+  const zeroAddress = "0x0000000000000000000000000000000000000000";
+  const amountText = amountInput.trim();
+
+  if (!/^(?:0|[1-9][0-9]*)(?:\.[0-9]+)?$/.test(amountText)) {
+    throw new Error("Amount must be a plain positive decimal, for example 0.10.");
+  }
+  if (recipient === zeroAddress || recipient === expectedAddress || recipient === tokenAddress) {
+    throw new Error("Refusing transfer: recipient must be a different normal wallet address.");
+  }
+
+  const provider = new JsonRpcProvider(MAINNET_RPC, 43114, { staticNetwork: true });
+  const network = await provider.getNetwork();
+  if (network.chainId !== 43114n) {
+    throw new Error(`Refusing to send: expected Avalanche mainnet chain ID 43114, received ${network.chainId}.`);
+  }
+
+  const readToken = new Contract(tokenAddress, ERC20_ABI, provider);
+  const [decimalsRaw, symbol, senderCode, recipientCode, senderAvax, senderTokenRaw, recipientTokenBeforeRaw, feeData] = await Promise.all([
+    readToken.decimals(),
+    readToken.symbol(),
+    provider.getCode(expectedAddress),
+    provider.getCode(recipient),
+    provider.getBalance(expectedAddress),
+    readToken.balanceOf(expectedAddress),
+    readToken.balanceOf(recipient),
+    provider.getFeeData(),
+  ]);
+  const decimals = Number(decimalsRaw);
+  const value = parseUnits(amountText, decimals);
+  const safetyCap = parseUnits("1", decimals);
+  if (value <= 0n) throw new Error("Amount must be greater than zero.");
+  if (value > safetyCap) {
+    throw new Error("This guarded demo command refuses to transfer more than 1 XSGD at a time.");
+  }
+  if (senderCode !== "0x" || recipientCode !== "0x") {
+    throw new Error("Refusing transfer: both sender and recipient must be normal wallets, not smart contracts.");
+  }
+  if (senderTokenRaw < value) {
+    throw new Error(`Insufficient ${symbol}. Balance is ${formatUnits(senderTokenRaw, decimals)} ${symbol}.`);
+  }
+
+  const tokenInterface = new Interface(ERC20_ABI);
+  const data = tokenInterface.encodeFunctionData("transfer", [recipient, value]);
+  const callRequest = { from: expectedAddress, to: tokenAddress, data };
+  const simulation = await provider.call(callRequest);
+  if (simulation !== "0x") {
+    const [succeeded] = tokenInterface.decodeFunctionResult("transfer", simulation);
+    if (!succeeded) throw new Error("The token contract simulation returned false. No transaction was signed.");
+  }
+  const estimatedGas = await provider.estimateGas(callRequest);
+  const gasLimit = estimatedGas + (estimatedGas / 5n);
+  const maxGasPrice = feeData.maxFeePerGas || feeData.gasPrice;
+  if (!maxGasPrice) throw new Error("Could not determine the Avalanche mainnet gas price.");
+  const estimatedMaxFee = gasLimit * maxGasPrice;
+  if (senderAvax <= estimatedMaxFee) {
+    throw new Error(`Insufficient AVAX for gas. Balance is ${formatEther(senderAvax)} AVAX; estimated maximum fee is ${formatEther(estimatedMaxFee)} AVAX.`);
+  }
+
+  console.log("");
+  console.log(yellow("REAL MAINNET TRANSFER — irreversible"));
+  console.log("Classification: controlled-wallet XSGD settlement proof; not a retail order or production x402 charge");
+  console.log("Network:        Avalanche C-Chain mainnet (chain ID 43114)");
+  console.log(`Token:          ${symbol} (${tokenAddress})`);
+  console.log(`Sender:         ${expectedAddress}`);
+  console.log(`Recipient:      ${recipient}`);
+  console.log(`Amount:         ${formatUnits(value, decimals)} ${symbol}`);
+  console.log(`Sender balance: ${formatUnits(senderTokenRaw, decimals)} ${symbol}`);
+  console.log(`Max gas estimate: ${formatEther(estimatedMaxFee)} AVAX`);
+  console.log("Simulation:     passed without signing");
+  console.log("");
+
+  const approved = await confirm({
+    message: `Broadcast exactly ${formatUnits(value, decimals)} ${symbol} to ${recipient} on Avalanche MAINNET?`,
+    default: false,
+  });
+  if (!approved) {
+    console.log("Cancelled. No transaction was signed or broadcast.");
+    return;
+  }
+
+  const encryptedJson = await readFile(keystorePath(nameInput), "utf8");
+  const unlockedWallet = await unlockKeystore(
+    encryptedJson,
+    `Unlock ${nameInput} to sign this exact mainnet transfer:`,
+  );
+  if (getAddress(unlockedWallet.address) !== expectedAddress) {
+    throw new Error(`Keystore address ${unlockedWallet.address} does not match the approved sender ${expectedAddress}. Nothing was signed.`);
+  }
+
+  const signer = unlockedWallet.connect(provider);
+  const signedToken = new Contract(tokenAddress, ERC20_ABI, signer);
+  const freshTokenBalance = await signedToken.balanceOf(expectedAddress);
+  if (freshTokenBalance < value) {
+    throw new Error(`Balance changed before signing and is now insufficient. No transaction was submitted.`);
+  }
+
+  console.log("Signing the one approved ERC-20 transfer...");
+  const transaction = await signedToken.transfer(recipient, value, { gasLimit });
+  console.log(`Submitted: ${transaction.hash}`);
+  console.log(`Snowtrace: https://snowtrace.io/tx/${transaction.hash}`);
+  const receipt = await transaction.wait(1);
+  if (!receipt || receipt.status !== 1) {
+    throw new Error(`Transaction failed: ${transaction.hash}`);
+  }
+
+  let transferVerified = false;
+  for (const log of receipt.logs) {
+    if (getAddress(log.address) !== tokenAddress) continue;
+    try {
+      const parsed = tokenInterface.parseLog(log);
+      if (
+        parsed?.name === "Transfer"
+        && getAddress(parsed.args.from) === expectedAddress
+        && getAddress(parsed.args.to) === recipient
+        && parsed.args.value === value
+      ) {
+        transferVerified = true;
+        break;
+      }
+    } catch {
+      // Ignore unrelated token logs and require the exact Transfer event below.
+    }
+  }
+  if (!transferVerified) {
+    throw new Error(`Transaction confirmed, but the exact Transfer event could not be verified. Inspect ${transaction.hash}.`);
+  }
+
+  const [senderTokenAfterRaw, recipientTokenAfterRaw] = await Promise.all([
+    readToken.balanceOf(expectedAddress),
+    readToken.balanceOf(recipient),
+  ]);
+  const paidFee = receipt.fee ?? (receipt.gasUsed * (receipt.gasPrice ?? 0n));
+  const proof = {
+    version: "done-mainnet-xsgd-proof-v1",
+    generatedAt: new Date().toISOString(),
+    environment: "mainnet",
+    classification: "controlled-wallet XSGD transfer; not a physical merchant purchase or production x402 payment",
+    network: {
+      name: "Avalanche C-Chain",
+      chainId: 43114,
+    },
+    token: {
+      symbol,
+      contract: tokenAddress,
+      decimals,
+    },
+    transfer: {
+      from: expectedAddress,
+      to: recipient,
+      amount: formatUnits(value, decimals),
+      transactionHash: transaction.hash,
+      blockNumber: receipt.blockNumber,
+      blockHash: receipt.blockHash,
+      explorerUrl: `https://snowtrace.io/tx/${transaction.hash}`,
+      transferEventVerified: true,
+    },
+    balances: {
+      senderBefore: formatUnits(senderTokenRaw, decimals),
+      senderAfter: formatUnits(senderTokenAfterRaw, decimals),
+      recipientBefore: formatUnits(recipientTokenBeforeRaw, decimals),
+      recipientAfter: formatUnits(recipientTokenAfterRaw, decimals),
+    },
+    gas: {
+      gasUsed: receipt.gasUsed.toString(),
+      feeAvax: formatEther(paidFee),
+    },
+  };
+  await writeFile(PUBLIC_MAINNET_PROOF, `${JSON.stringify(proof, null, 2)}\n`);
+
+  console.log(green(`Confirmed in block ${receipt.blockNumber}; exact Transfer event verified.`));
+  console.log(`Sender after:    ${proof.balances.senderAfter} ${symbol}`);
+  console.log(`Recipient after: ${proof.balances.recipientAfter} ${symbol}`);
+  console.log(`Public proof:    ${PUBLIC_MAINNET_PROOF}`);
+}
+
 async function sendFujiAvax(nameInput, recipientInput, amountInput) {
   const recipient = getAddress(recipientInput);
   const value = parseEther(amountInput);
@@ -669,6 +852,14 @@ wallet
   .description("Decrypt a keystore and print its address")
   .option("-n, --name <name>", "Local wallet name", "wallet")
   .action(async ({ name }) => showKeystoreAddress(name));
+wallet
+  .command("send-mainnet-xsgd")
+  .description("Send an explicitly confirmed, capped amount of real XSGD on Avalanche mainnet")
+  .requiredOption("-t, --to <address>", "Recipient normal-wallet EVM address")
+  .requiredOption("-m, --amount <xsgd>", "Exact XSGD amount (maximum 1)")
+  .option("-n, --name <name>", "Local encrypted wallet name", "wallet")
+  .option("-a, --address <address>", "Address the encrypted wallet must match", DEFAULT_ADDRESS)
+  .action(async ({ name, address, to, amount }) => sendMainnetXsgd(name, address, to, amount));
 wallet
   .command("send-test-avax")
   .description("Send AVAX on Fuji testnet from an encrypted local wallet")

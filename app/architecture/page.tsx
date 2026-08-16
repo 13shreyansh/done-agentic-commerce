@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   twitter: { images: [] },
 };
 
-const SNOWTRACE = "https://testnet.snowtrace.io/tx/0x195d69332d96bc8109ddd6f16bf55aaa95e968301d75951e69f7d5fd3733cb5d";
+const MAINNET_SNOWTRACE = "https://snowtrace.io/tx/0x7cad6ef81b1bd4e35860f2d4351098d964d776a4513df02491f338200faba2f5";
 
 type Status = "live" | "executed" | "sandbox";
 
@@ -31,7 +31,7 @@ export default function Architecture() {
   return (
     <main className="architecture-page">
       <header className="architecture-hero">
-        <nav><a href="/live">← Live evidence console</a><a href={SNOWTRACE} target="_blank" rel="noreferrer">Latest Snowtrace proof ↗</a></nav>
+        <nav><a href="/live">← Live evidence console</a><a href={MAINNET_SNOWTRACE} target="_blank" rel="noreferrer">Mainnet Snowtrace proof ↗</a></nav>
         <div className="architecture-kicker"><span /> IMPLEMENTED ARCHITECTURE</div>
         <h1>One simple message.<br /><em>Four inspectable boundaries.</em></h1>
         <p>DONE turns an outcome into a ranked product, a single-use authority, a machine payment, and a replay-safe execution record. The labels below state exactly what ran and what remains a sandbox.</p>
@@ -59,6 +59,7 @@ export default function Architecture() {
           <div className="boundary-heading"><span>03</span><div><b>Payment and commerce</b><small>Machine-readable value transfer.</small></div></div>
           <Node status="executed" eyebrow="Protocol" title="StraitsX x402">Returned an exact HTTP 402 request and accepted an EIP-3009 payment authorization.</Node>
           <Node status="executed" eyebrow="Settlement" title="Avalanche Fuji">Settles the selected product’s exact test-XSGD total on C-Chain and verifies the emitted transfer event.</Node>
+          <Node status="executed" eyebrow="Mainnet proof" title="Real XSGD transfer">A separately approved 0.10 XSGD controlled-wallet transfer confirmed on Avalanche mainnet. This proves real settlement without mislabelling it as a merchant order.</Node>
           <Node status="sandbox" eyebrow="Capability" title="Card + merchant checkout">Returns the sponsor sandbox capability and prepares a real Shopify cart handoff. A physical retail order is never claimed without a production card rail.</Node>
         </div>
 
